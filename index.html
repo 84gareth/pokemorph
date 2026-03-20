@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PokéMorph v10.4</title>
+    <title>PokéMorph v11.3</title>
     <style>
         :root { 
             --card-gold: #ffd700;
@@ -15,13 +15,25 @@
         }
         html, body { 
             position: fixed; overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; 
-            padding-top: env(safe-area-inset-top, 20px);
-            padding-bottom: env(safe-area-inset-bottom, 0px);
             box-sizing: border-box; touch-action: none; background: #000; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            display: flex; justify-content: center; align-items: center; 
             font-family: 'Arial Rounded MT Bold', sans-serif; -webkit-user-select: none; user-select: none; 
         }
-        
+
+        #start-gate { position: fixed; inset: 0; background: radial-gradient(circle, #1a1c2c 0%, #000 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo-text { font-size: 15vw; font-weight: 900; color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); text-shadow: 0 4px 0 var(--poke-blue); position: relative; }
+        .logo-text::after { content: 'PokéMorph'; position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, #fff, var(--poke-yellow) 60%, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-text-stroke: 0; }
+        .play-icon-btn { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pulsePlay 2s infinite; margin-top: 30px; }
+        .play-triangle { width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 35px solid var(--poke-blue); margin-left: 8px; }
+
+        #game-view { 
+            width: 100%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding-top: env(safe-area-inset-top, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            box-sizing: border-box;
+        }
+
         #pokedex-trigger { 
             position: fixed; top: calc(env(safe-area-inset-top, 20px) + 5px); right: 15px; 
             width: 50px; height: 50px; background: white; border: 4px solid #333; border-radius: 50%; 
@@ -30,15 +42,12 @@
         #pokedex-trigger::before { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
         #pokedex-trigger::after { content: ''; width: 14px; height: 14px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; }
 
-        #start-gate { position: fixed; inset: 0; background: radial-gradient(circle, #1a1c2c 0%, #000 100%); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .logo-text { font-size: 15vw; font-weight: 900; color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); text-shadow: 0 4px 0 var(--poke-blue); }
-
         #pokemon-card { 
-            width: 95vw; height: calc(98vh - env(safe-area-inset-top, 20px) - env(safe-area-inset-bottom, 10px));
-            max-width: 500px; background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; 
-            padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; 
+            width: 95vw; height: 85vh; max-width: 500px; background: #fdfdfd; 
+            border: 8px solid var(--card-gold); border-radius: 35px; padding: 12px; 
+            display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; 
         }
-        
+
         .header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; }
         #poke-name-badge { font-size: 22px; color: #333; background: white; padding: 4px 15px; border-radius: 15px; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
         .hp-bar { width: 120px; height: 16px; background: #222; border-radius: 10px; border: 2px solid #000; overflow: hidden; }
@@ -47,11 +56,13 @@
         .image-window { width: 100%; flex-grow: 1; border: 4px solid #444; border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
         #poke-img { height: 85%; filter: drop-shadow(0 0 15px white); z-index: 5; }
 
+        /* REPLAY & TICKET AREA */
         #core-area { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
-        #core-fragment { min-width: 110px; height: 50px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #fff; }
         .replay-btn { width: 50px; height: 50px; background: #00d4ff; border: 3px solid #fff; border-radius: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #008ba3; }
+        #core-fragment { min-width: 110px; height: 50px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #fff; }
         
-        .dot { width: 24px; height: 24px; background: #ccc; border-radius: 50%; border: 2px solid #888; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; }
+        #checkpoints { display: flex; gap: 8px; }
+        .dot { width: 24px; height: 24px; background: #ccc; border-radius: 50%; border: 2px solid #888; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; font-weight: bold; }
         .dot.active { background: var(--hp-green); border-color: #1b5e20; color: white; transform: scale(1.1); }
 
         #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 5px; flex-shrink: 0; }
@@ -65,21 +76,23 @@
         .dex-entry.locked img { filter: brightness(0) contrast(0.5); opacity: 0.8; }
         
         #evo-scene { position: fixed; inset: 0; z-index: 8000; display: none; background: radial-gradient(circle, #fff, #3a8cff, #000); flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .game-overlay { display: none; position: absolute; inset: 0; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; border-radius: 25px; padding: 20px; text-align: center; }
-        
+        #evo-scene.active { display: flex; animation: rotateBg 1s infinite linear; }
         #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8500; }
+        
+        @keyframes rotateBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
         @keyframes shake { 0%, 100% {transform:translateX(0)} 20% {transform:translateX(-8px)} 80% {transform:translateX(8px)} }
         @keyframes pulsePlay { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .game-overlay { display: none; position: absolute; inset: 0; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; border-radius: 25px; padding: 20px; text-align: center; }
     </style>
 </head>
 <body>
-
-<div id="pokedex-trigger" onclick="openDex()"></div>
 
 <div id="start-gate">
     <div class="logo-text">PokéMorph</div>
     <div class="play-icon-btn" onclick="startGame()"><div class="play-triangle"></div></div>
 </div>
+
+<div id="pokedex-trigger" onclick="openDex()"></div>
 
 <div id="pokedex-view">
     <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;">
@@ -87,47 +100,53 @@
         <div onclick="closeDex()" style="font-size:30px; cursor:pointer">X</div>
     </div>
     <div id="pokedex-list"></div>
-    <div style="padding:10px; border-top:2px solid white; display:flex; justify-content:center;">
+    <div style="padding:10px; border-top:2px solid white; display:flex; justify-content:center; padding-bottom: env(safe-area-inset-bottom, 15px);">
         <button style="background:none; border:none; font-size:32px; cursor:pointer;" onclick="resetCollection()">🗑️</button>
     </div>
 </div>
 
 <div id="evo-scene">
-    <img id="evo-poke-img" style="height:60%;" src="">
-    <div id="evo-text" style="position: absolute; bottom: 15%; color: white; font-size: 32px; font-weight: 900; text-shadow: 0 4px 10px #000;">WHAT?</div>
+    <img id="evo-poke-img" style="height:60%" src="">
+    <div id="evo-text" style="position: absolute; bottom: 15%; color: white; font-size: 32px; font-weight: 900; z-index: 20;">WHAT?</div>
 </div>
 
 <canvas id="fx-canvas"></canvas>
 
-<div id="pokemon-card">
-    <div id="finale-overlay" class="game-overlay" style="background: radial-gradient(circle, #2a0845, #000); color: gold;">
-        <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src="">
-        <div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0;">MEGA EVOLVED!</div>
-        <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
-        <button class="target" style="background: var(--hp-green); color: white; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKÉMON</button>
-    </div>
-
-    <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;">
-        <img id="ko-img" style="width: 140px; filter: grayscale(1);" src="">
-        <p>Don't give up! Try again!</p>
-        <button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button>
-    </div>
-
-    <div class="header">
-        <div id="poke-name-badge">NAME</div>
-        <div class="hp-bar"><div id="hp-fill"></div></div>
-    </div>
-    <div class="image-window" id="img-win">
-        <div id="backdrop-container" style="position:absolute; inset:0;"></div>
-        <img id="poke-img" src="">
-    </div>
-    <div id="gameplay-ui">
-        <div id="core-area">
-            <button class="replay-btn" onclick="replaySound()">🔊</button>
-            <div id="core-fragment">...</div>
-            <div id="checkpoints"><div class="dot" id="dot-0">✓</div><div class="dot" id="dot-1">✓</div><div class="dot" id="dot-2">✓</div></div>
+<div id="game-view">
+    <div id="pokemon-card">
+        <div id="finale-overlay" class="game-overlay" style="background: radial-gradient(circle, #2a0845, #000); color: gold;">
+            <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src="">
+            <div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0;">MEGA EVOLVED!</div>
+            <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
+            <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKÉMON</button>
         </div>
-        <div id="word-grid"></div>
+
+        <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;">
+            <img id="ko-img" style="width: 140px; filter: grayscale(1);" src="">
+            <p>Don't give up! Try again!</p>
+            <button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button>
+        </div>
+
+        <div class="header">
+            <div id="poke-name-badge">NAME</div>
+            <div class="hp-bar"><div id="hp-fill"></div></div>
+        </div>
+        <div class="image-window" id="img-win">
+            <div id="backdrop-container" style="position:absolute; inset:0;"></div>
+            <img id="poke-img" src="">
+        </div>
+        <div id="gameplay-ui">
+            <div id="core-area">
+                <button class="replay-btn" onclick="replaySound()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
+                <div id="core-fragment">...</div>
+                <div id="checkpoints">
+                    <div class="dot" id="dot-0">✓</div><div class="dot" id="dot-1">✓</div><div class="dot" id="dot-2">✓</div>
+                </div>
+            </div>
+            <div id="word-grid"></div>
+        </div>
     </div>
 </div>
 
@@ -161,7 +180,7 @@
         grass: `<svg viewBox="0 0 200 100" style="width:100%; height:100%" preserveAspectRatio="none"><rect width="200" height="100" fill="#a8e063"/><circle cx="50" cy="85" rx="60" ry="20" fill="#56ab2f"/><circle cx="150" cy="90" rx="70" ry="25" fill="#2E8B57"/></svg>`
     };
 
-    const trapPool = ["CAT", "DOG", "SUN", "RUN", "BIG", "RED", "FLY", "TOP", "HAT", "VAN", "BOX", "SKY", "CUP", "JAM"];
+    const trapPool = ["CAT", "DOG", "SUN", "RUN", "BIG", "RED", "FLY", "TOP", "HAT", "VAN", "BOX", "JAM", "SKY", "LOG"];
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let family, stageIdx = 0, hp = 100, currentSet, matchesThisRound = 0, isGameOver = false;
     let unlocked = JSON.parse(localStorage.getItem('pmUnlocked_v9')) || [];
@@ -190,7 +209,7 @@
     }
 
     function speak(txt) { return new Promise(r => { synth.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang='en-GB'; u.rate=0.85; u.onend=r; synth.speak(u); setTimeout(r, 2200); }); }
-    function startGame() { document.getElementById('start-gate').style.display='none'; resetGame(); }
+    function startGame() { document.getElementById('start-gate').style.display='none'; if(audioCtx.state==='suspended') audioCtx.resume(); resetGame(); }
     function replaySound() { if(currentSet) speak(currentSet.core); }
 
     function handleTap(el, isCorrect, full, phonetic) {
@@ -231,19 +250,23 @@
     async function runEvolution() {
         if(stageIdx >= 2) { 
             if(!unlocked.includes(family.mega.i)) { unlocked.push(family.mega.i); localStorage.setItem('pmUnlocked_v9', JSON.stringify(unlocked)); }
-            isGameOver = true; document.getElementById('mega-img-final').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.mega.i}.png`;
-            document.getElementById('parade-row').innerHTML = ""; family.p.forEach(p => { document.getElementById('parade-row').innerHTML += `<img style="width:50px" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png">`; });
-            document.getElementById('finale-overlay').style.display = 'flex'; speak("Amazing! You are a true Mega Master!"); return; 
+            isGameOver = true; 
+            document.getElementById('mega-img-final').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.mega.i}.png`;
+            const row = document.getElementById('parade-row'); row.innerHTML = "";
+            family.p.forEach(p => { row.innerHTML += `<img style="width:50px" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png">`; });
+            document.getElementById('finale-overlay').style.display = 'flex'; 
+            speak("Amazing! You are a true Mega Master!");
+            return; 
         }
         const oldN = family.p[stageIdx].n; stageIdx++;
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
-        evoImg.src = document.getElementById('poke-img').src; scene.style.display = 'flex'; playSfx('evo_build');
+        evoImg.src = document.getElementById('poke-img').src; scene.classList.add('active'); playSfx('evo_build');
         await speak(`${oldN} is evolving!`);
-        for(let i=0; i<50; i++) particles.push({x:canvas.width/2, y:canvas.height/2, vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15, c:'#fff', l:1});
+        for(let i=0; i<40; i++) particles.push({x:canvas.width/2, y:canvas.height/2, vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15, c:'#fff', l:1});
         evoImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.p[stageIdx].i}.png`;
         document.getElementById('evo-text').innerText = family.p[stageIdx].n.toUpperCase() + "!";
         await speak(`${oldN} evolved into ${family.p[stageIdx].n}!`);
-        setTimeout(() => { scene.style.display = 'none'; initStage(); }, 1000);
+        setTimeout(() => { scene.classList.remove('active'); initStage(); }, 1000);
     }
 
     function openDex() {

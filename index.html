@@ -56,7 +56,6 @@
         .image-window { width: 100%; flex-grow: 1; border: 4px solid #444; border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
         #poke-img { height: 85%; filter: drop-shadow(0 0 15px white); z-index: 5; }
 
-        /* REPLAY & TICKET AREA */
         #core-area { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
         .replay-btn { width: 50px; height: 50px; background: #00d4ff; border: 3px solid #fff; border-radius: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #008ba3; }
         #core-fragment { min-width: 110px; height: 50px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #fff; }
@@ -138,7 +137,7 @@
         <div id="gameplay-ui">
             <div id="core-area">
                 <button class="replay-btn" onclick="replaySound()">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                 </button>
                 <div id="core-fragment">...</div>
                 <div id="checkpoints">
@@ -170,7 +169,7 @@
         { core: "SIGN", items: [{ans:"DESIGN", mask:"DE ____", p:"Dee-zine"}, {ans:"SIGNAL", mask:"____ AL", p:"Sig-nal"}, {ans:"SIGNATURE", mask:"____ ATURE", p:"Sig-nah-chur"}] },
         { core: "LIGHT", items: [{ans:"FLASHLIGHT", mask:"FLASH ____", p:"Flash-light"}, {ans:"LIGHTNING", mask:"____ NING", p:"Light-ning"}, {ans:"SUNLIGHT", mask:"SUN ____", p:"Sun-light"}] },
         { core: "POWER", items: [{ans:"POWERFUL", mask:"____ FUL", p:"Pow-er-ful"}, {ans:"EMPOWER", mask:"EM ____", p:"Em-pow-er"}, {ans:"POWERLESS", mask:"____ LESS", p:"Pow-er-less"}] },
-        { core: "PRESS", items: [{ans:"EXPRESS", mask:"EX ____", p:"Ex-press"}, {ans:"IMPRESS", mask:"IM ____", p:"Im-press"}, {ans:"PRESSURE", mask:"____ URE", p:"Presh-ur"}] },
+        { core: "PRESS", items: [{ans:"EXPRESS", mask:"EX ____", p:"Ex-presh"}, {ans:"IMPRESS", mask:"IM ____", p:"Im-presh"}, {ans:"PRESSURE", mask:"____ URE", p:"Presh-ur"}] },
         { core: "PORT", items: [{ans:"AIRPORT", mask:"AIR ____", p:"Air-port"}, {ans:"SUPPORT", mask:"SUP ____", p:"Sup-port"}, {ans:"REPORT", mask:"RE ____", p:"Re-port"}] }
     ];
 
@@ -183,7 +182,7 @@
     const trapPool = ["CAT", "DOG", "SUN", "RUN", "BIG", "RED", "FLY", "TOP", "HAT", "VAN", "BOX", "JAM", "SKY", "LOG"];
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let family, stageIdx = 0, hp = 100, currentSet, matchesThisRound = 0, isGameOver = false;
-    let unlocked = JSON.parse(localStorage.getItem('pmUnlocked_v9')) || [];
+    let unlocked = JSON.parse(localStorage.getItem('pmUnlocked_v11')) || [];
 
     const canvas = document.getElementById('fx-canvas'), ctx = canvas.getContext('2d');
     let particles = [];
@@ -219,7 +218,7 @@
             el.innerText = full; el.classList.add('matched'); playSfx('chime');
             matchesThisRound++;
             if(matchesThisRound === 3) {
-                if(!unlocked.includes(family.p[stageIdx].i)) { unlocked.push(family.p[stageIdx].i); localStorage.setItem('pmUnlocked_v9', JSON.stringify(unlocked)); }
+                if(!unlocked.includes(family.p[stageIdx].i)) { unlocked.push(family.p[stageIdx].i); localStorage.setItem('pmUnlocked_v11', JSON.stringify(unlocked)); }
                 speak(phonetic || full).then(() => setTimeout(runEvolution, 400)); 
             } else speak(phonetic || full);
         } else { 
@@ -249,7 +248,7 @@
 
     async function runEvolution() {
         if(stageIdx >= 2) { 
-            if(!unlocked.includes(family.mega.i)) { unlocked.push(family.mega.i); localStorage.setItem('pmUnlocked_v9', JSON.stringify(unlocked)); }
+            if(!unlocked.includes(family.mega.i)) { unlocked.push(family.mega.i); localStorage.setItem('pmUnlocked_v11', JSON.stringify(unlocked)); }
             isGameOver = true; 
             document.getElementById('mega-img-final').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.mega.i}.png`;
             const row = document.getElementById('parade-row'); row.innerHTML = "";
@@ -278,7 +277,7 @@
         document.getElementById('pokedex-view').style.display = 'flex';
     }
     function closeDex() { document.getElementById('pokedex-view').style.display = 'none'; }
-    function resetCollection() { if(confirm("Are you sure? This will reset your whole collection!")) { unlocked = []; localStorage.removeItem('pmUnlocked_v9'); closeDex(); document.getElementById('start-gate').style.display='flex'; } }
+    function resetCollection() { if(confirm("Are you sure? This will reset your whole collection!")) { unlocked = []; localStorage.removeItem('pmUnlocked_v11'); closeDex(); document.getElementById('start-gate').style.display='flex'; } }
     function resetGame() { isGameOver = false; stageIdx = 0; document.getElementById('finale-overlay').style.display = 'none'; document.getElementById('defeat-overlay').style.display = 'none'; family = megaLibrary[Math.floor(Math.random()*megaLibrary.length)]; initStage(); }
     animateFX();
 </script>

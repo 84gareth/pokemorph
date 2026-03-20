@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>PokéMorph v10.1</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>PokéMorph v10.2</title>
     <style>
         :root { 
             --card-gold: #ffd700;
@@ -12,19 +13,57 @@
             --poke-yellow: #ffcb05; --poke-blue: #3d7dca;
             --pokedex-red: #dc0a2d;
         }
-        html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; touch-action: none; background: #000; display: flex; justify-content: center; align-items: center; font-family: 'Arial Rounded MT Bold', sans-serif; -webkit-user-select: none; user-select: none; }
+        /* iOS Safe Area Integration */
+        html, body { 
+            position: fixed; 
+            overflow: hidden; 
+            width: 100%; 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            /* Push content down under Dynamic Island/Notch */
+            padding-top: env(safe-area-inset-top, 20px);
+            box-sizing: border-box;
+            touch-action: none; 
+            background: #000; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            font-family: 'Arial Rounded MT Bold', sans-serif; 
+            -webkit-user-select: none; 
+            user-select: none; 
+        }
         
-        #pokedex-trigger { position: fixed; top: 15px; right: 15px; width: 50px; height: 50px; background: white; border: 4px solid #333; border-radius: 50%; z-index: 100; cursor: pointer; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        /* POKEBALL ICON - Adjusted for Top Margin */
+        #pokedex-trigger { 
+            position: fixed; 
+            top: calc(env(safe-area-inset-top, 20px) + 10px); 
+            right: 15px; 
+            width: 50px; height: 50px; 
+            background: white; border: 4px solid #333; border-radius: 50%; 
+            z-index: 100; cursor: pointer; overflow: hidden; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+        }
         #pokedex-trigger::before { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
         #pokedex-trigger::after { content: ''; width: 14px; height: 14px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; }
 
+        /* SPLASH SCREEN */
         #start-gate { position: fixed; inset: 0; background: radial-gradient(circle, #1a1c2c 0%, #000 100%); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .logo-text { font-size: 15vw; font-weight: 900; color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); text-shadow: 0 4px 0 var(--poke-blue); position: relative; }
         .logo-text::after { content: 'PokéMorph'; position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, #fff, var(--poke-yellow) 60%, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-text-stroke: 0; }
         .play-icon-btn { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pulsePlay 2s infinite; margin-top: 30px; }
         .play-triangle { width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 35px solid var(--poke-blue); margin-left: 8px; }
 
-        #pokemon-card { width: 95vw; height: 88vh; max-width: 500px; background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; }
+        /* MAIN POKEMON CARD */
+        #pokemon-card { 
+            width: 95vw; 
+            height: calc(95vh - env(safe-area-inset-top, 20px)); 
+            max-width: 500px; 
+            background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; 
+            padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; 
+        }
+        
         .header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; }
         #poke-name-badge { font-size: 22px; color: #333; background: white; padding: 4px 15px; border-radius: 15px; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
         .hp-bar { width: 120px; height: 16px; background: #222; border-radius: 10px; border: 2px solid #000; overflow: hidden; }
@@ -46,14 +85,17 @@
         .matched { background: var(--hp-green) !important; color: white !important; pointer-events: none; }
         .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; }
 
-        /* POKEDEX */
-        #pokedex-view { position: fixed; inset: 0; background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding: 20px; color: white; }
+        /* POKEDEX VIEW */
+        #pokedex-view { 
+            position: fixed; inset: 0; 
+            padding-top: env(safe-area-inset-top, 20px);
+            background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding-left: 20px; padding-right: 20px; color: white; 
+        }
         #pokedex-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 20px 0; }
         .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
         .dex-entry.locked img { filter: brightness(0) contrast(0.5); opacity: 0.8; }
-        #pokedex-footer { padding: 10px; border-top: 2px solid white; display: flex; justify-content: center; }
-        .reset-icon-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: white; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); transition: transform 0.2s; }
-        .reset-icon-btn:active { transform: scale(0.9); }
+        #pokedex-footer { padding: 10px; border-top: 2px solid white; display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 10px); }
+        .reset-icon-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: white; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
 
         #evo-scene { position: fixed; inset: 0; z-index: 8000; display: none; background: radial-gradient(circle, #fff, #3a8cff, #000); flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         #evo-scene.active { display: flex; animation: rotateBg 1s infinite linear; }
@@ -81,7 +123,7 @@
     </div>
     <div id="pokedex-list"></div>
     <div id="pokedex-footer">
-        <button class="reset-icon-btn" onclick="resetCollection()" title="Reset Collection">🗑️</button>
+        <button class="reset-icon-btn" onclick="resetCollection()">🗑️</button>
     </div>
 </div>
 
@@ -151,9 +193,9 @@
     ];
 
     const backdropSVGs = {
-        fire: `<svg class="backdrop-svg" viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#a82e2e"/><path d="M0 100 L40 30 L80 100 L140 10 L200 100 Z" fill="#6b1d1d"/><circle cx="30" cy="30" r="5" fill="#ffcc00" opacity=".4"/></svg>`,
-        water: `<svg class="backdrop-svg" viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#87CEEB"/><path d="M0 80 Q50 60 100 80 T200 80 L200 100 L0 100 Z" fill="#4169E1"/><circle cx="170" cy="30" r="10" fill="white" opacity=".5"/></svg>`,
-        grass: `<svg class="backdrop-svg" viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#a8e063"/><circle cx="50" cy="85" rx="60" ry="20" fill="#56ab2f"/><circle cx="150" cy="90" rx="70" ry="25" fill="#2E8B57"/></svg>`
+        fire: `<svg viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#a82e2e"/><path d="M0 100 L40 30 L80 100 L140 10 L200 100 Z" fill="#6b1d1d"/><circle cx="30" cy="30" r="5" fill="#ffcc00" opacity=".4"/></svg>`,
+        water: `<svg viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#87CEEB"/><path d="M0 80 Q50 60 100 80 T200 80 L200 100 L0 100 Z" fill="#4169E1"/><circle cx="170" cy="30" r="10" fill="white" opacity=".5"/></svg>`,
+        grass: `<svg viewBox="0 0 200 100" style="position:absolute;inset:0" preserveAspectRatio="none"><rect width="200" height="100" fill="#a8e063"/><circle cx="50" cy="85" rx="60" ry="20" fill="#56ab2f"/><circle cx="150" cy="90" rx="70" ry="25" fill="#2E8B57"/></svg>`
     };
 
     const winPhrases = [ "Incredible! You and [P] are an unstoppable team!", "Masterful! [P] has reached its ultimate form!", "Amazing! Your bond with [P] is stronger than ever!", "Wow! You are a true Mega Master!" ];
@@ -188,7 +230,7 @@
     }
 
     function speak(txt) { return new Promise(r => { synth.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang='en-GB'; u.rate=0.85; u.onend=r; synth.speak(u); setTimeout(r, 2200); }); }
-    function startGame() { document.getElementById('start-gate').style.display='none'; if(audioCtx.state==='suspended') audioCtx.resume(); resetGame(); }
+    function startGame() { document.getElementById('start-gate').style.display='none'; resetGame(); }
     function replaySound() { if(currentSet) speak(currentSet.core); }
 
     function handleTap(el, isCorrect, full, phonetic) {
@@ -240,7 +282,6 @@
             return; 
         }
         const oldN = family.p[stageIdx].n; stageIdx++;
-        const newN = family.p[stageIdx].n;
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
         evoImg.src = document.getElementById('poke-img').src; scene.classList.add('active'); playSfx('evo_build');
         await speak(`${oldN} is evolving!`);
@@ -260,16 +301,7 @@
         document.getElementById('pokedex-view').style.display = 'flex';
     }
     function closeDex() { document.getElementById('pokedex-view').style.display = 'none'; }
-    
-    function resetCollection() {
-        if(confirm("Are you sure? This will reset your whole collection!")) {
-            unlocked = [];
-            localStorage.removeItem('pmUnlocked_v9');
-            document.getElementById('pokedex-view').style.display = 'none';
-            document.getElementById('start-gate').style.display = 'flex';
-        }
-    }
-
+    function resetCollection() { if(confirm("Are you sure? This will reset your whole collection!")) { unlocked = []; localStorage.removeItem('pmUnlocked_v9'); document.getElementById('pokedex-view').style.display = 'none'; document.getElementById('start-gate').style.display = 'flex'; } }
     function resetGame() { isGameOver = false; stageIdx = 0; document.getElementById('finale-overlay').style.display = 'none'; document.getElementById('defeat-overlay').style.display = 'none'; family = megaLibrary[Math.floor(Math.random()*megaLibrary.length)]; initStage(); }
     animateFX();
 </script>

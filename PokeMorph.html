@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PokéMorph v4.2: Infinite Variety</title>
+    <style>
+        :root { 
+            --card-gold: #d4af37; --hp-green: #4caf50; --hp-red: #ff4422; 
+            --aura: rgba(255,255,255,0.5); --card-base: #fdfdfd;
+            --type-tint: rgba(255,255,255,0.1);
+        }
+        html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; touch-action: none; background: #000; display: flex; justify-content: center; align-items: center; }
+        body { font-family: 'Arial Rounded MT Bold', sans-serif; -webkit-user-select: none; user-select: none; }
+        #pokemon-card { 
+            width: 98vw; height: 96vh; max-width: 650px; max-height: 950px; 
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 10px),
+                        radial-gradient(circle at 50% 30%, var(--type-tint) 0%, var(--card-base) 70%);
+            border: 12px solid var(--card-gold); border-radius: 45px; padding: 15px; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 70px rgba(255,255,255,0.2); box-sizing: border-box; z-index: 10;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; z-index: 20; }
+        #poke-name-badge { background: linear-gradient(to bottom, #ffd700, #b8860b); color: #111; padding: 4px 20px; border-radius: 50px; font-size: 22px; font-weight: 900; border: 2px solid #fff; box-shadow: 2px 3px 0px rgba(0,0,0,0.2); }
+        .hp-bar { width: 130px; height: 16px; background: #222; border-radius: 10px; border: 2px solid #000; overflow: hidden; }
+        #hp-fill { width: 100%; height: 100%; background: var(--hp-green); transition: width 0.5s ease; }
+        .image-window { width: 100%; flex-grow: 10; border: 6px solid #444; border-radius: 30px; position: relative; overflow: hidden; background: #222; z-index: 1; box-shadow: inset 0 0 30px #000; margin-bottom: 10px; }
+        .bg-fire { background: radial-gradient(circle at center, #ff8c00, #ff4e50, #222); }
+        .bg-water { background: radial-gradient(circle at center, #6dd5fa, #2980b9, #111); }
+        .bg-grass { background: radial-gradient(circle at center, #a8e063, #56ab2f, #111); }
+        #poke-img { position: absolute; height: 92%; left: 50%; top: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 25px white); pointer-events: none; z-index: 10; }
+        #status-msg { position: absolute; top: 20%; width: 100%; text-align: center; color: #fff; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 10px #000; z-index: 15; pointer-events: none; }
+        #core-fragment { width: 50%; height: 60px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 10px auto; border: 3px solid #fff; box-shadow: 0 5px 0 #000; text-shadow: 1px 1px 0px #000; z-index: 20; }
+        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 10px; z-index: 20; }
+        .target { background: linear-gradient(to bottom, #fff, #e0e0e0); border: 2px solid #666; padding: 10px; border-radius: 12px; font-size: 16px; color: #333; text-align: center; font-weight: bold; cursor: pointer; transition: 0.1s; box-shadow: 0 3px 0 #999; display: flex; align-items: center; justify-content: center; min-height: 40px; }
+        .target:active { transform: translateY(3px); box-shadow: none; }
+        .matched { background: var(--hp-green) !important; color: white !important; border-color: #1b5e20; box-shadow: 0 3px 0 #1b5e20; pointer-events: none; }
+        .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; border-color: #8b0000; }
+        .game-overlay { display: none; position: absolute; inset: 0; z-index: 3000; flex-direction: column; align-items: center; justify-content: center; border-radius: 35px; padding: 20px; text-align: center; }
+        #finale-overlay { background: radial-gradient(circle, #2a0845, #000000); color: gold; text-shadow: 0 0 15px gold; }
+        #defeat-overlay { background: radial-gradient(circle, #222, #000); color: #fff; }
+        .evo-line { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; justify-content: center; }
+        .evo-line img, .ko-img { width: 140px; filter: drop-shadow(0 0 25px #fff); animation: heroEntrance 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
+        .ko-img { filter: grayscale(1) contrast(1.2) drop-shadow(0 0 15px red); }
+        .big-btn { padding: 18px 50px; font-size: 24px; color:white; border:4px solid white; border-radius:30px; cursor:pointer; font-weight:bold; transition: 0.2s; }
+        .gold-btn { background:linear-gradient(to bottom, #ffd700, #ff8c00); box-shadow: 0 10px 0 #b8860b; }
+        .red-btn { background:linear-gradient(to bottom, #ff4422, #8b0000); box-shadow: 0 10px 0 #4a0000; margin-top: 20px; }
+        #fireworks-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 2500; }
+        @keyframes heroEntrance { from { opacity: 0; transform: scale(0.5) translateY(60px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes shake { 0%, 100% {transform:translateX(0)} 20% {transform:translateX(-12px)} 80% {transform:translateX(12px)} }
+        .evo-tunnel { background: radial-gradient(circle, #fff, #3a8cff, #000) !important; animation: rotateBg 0.5s infinite linear !important; }
+        @keyframes rotateBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    </style>
+</head>
+<body>
+<canvas id="fireworks-canvas"></canvas>
+<div id="pokemon-card">
+    <div id="finale-overlay" class="game-overlay">
+        <h1 style="font-size: 52px; margin: 0;">CHAMPION!</h1>
+        <div class="evo-line" id="evo-line-display"></div>
+        <button class="big-btn gold-btn" onclick="location.reload()">NEXT POKÉMON</button>
+    </div>
+    <div id="defeat-overlay" class="game-overlay">
+        <h1 style="font-size: 44px; margin: 0; color: var(--hp-red);">OH NO!</h1>
+        <img id="ko-poke-img" class="ko-img" src="">
+        <p id="defeat-text" style="font-size: 20px; max-width: 85%; line-height: 1.4;">Don't give up! Your Pokémon needs more practice to evolve!</p>
+        <button class="big-btn red-btn" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+    <div class="header">
+        <div id="poke-name-badge">NAME</div>
+        <div class="hp-bar"><div id="hp-fill"></div></div>
+    </div>
+    <div id="art-bg" class="image-window">
+        <div id="status-msg"></div>
+        <img id="poke-img" src="" alt="">
+    </div>
+    <div id="gameplay-ui">
+        <div id="core-fragment">ROOT</div>
+        <div id="word-grid"></div>
+    </div>
+</div>
+<script>
+    const starterLibrary = [
+        { t:'grass', p:[{n:'Bulbasaur',i:1},{n:'Ivysaur',i:2},{n:'Venusaur',i:3}] }, { t:'fire', p:[{n:'Charmander',i:4},{n:'Charmeleon',i:5},{n:'Charizard',i:6}] }, { t:'water', p:[{n:'Squirtle',i:7},{n:'Wartortle',i:8},{n:'Blastoise',i:9}] },
+        { t:'grass', p:[{n:'Chikorita',i:152},{n:'Bayleef',i:153},{n:'Meganium',i:154}] }, { t:'fire', p:[{n:'Cyndaquil',i:155},{n:'Quilava',i:156},{n:'Typhlosion',i:157}] }, { t:'water', p:[{n:'Totodile',i:158},{n:'Croconaw',i:159},{n:'Feraligatr',i:160}] },
+        { t:'grass', p:[{n:'Treecko',i:252},{n:'Grovyle',i:253},{n:'Sceptile',i:254}] }, { t:'fire', p:[{n:'Torchic',i:255},{n:'Combusken',i:256},{n:'Blaziken',i:257}] }, { t:'water', p:[{n:'Mudkip',i:258},{n:'Marshtomp',i:259},{n:'Swampert',i:260}] },
+        { t:'grass', p:[{n:'Turtwig',i:387},{n:'Grotle',i:388},{n:'Torterra',i:389}] }, { t:'fire', p:[{n:'Chimchar',i:390},{n:'Monferno',i:391},{n:'Infernape',i:392}] }, { t:'water', p:[{n:'Piplup',i:393},{n:'Prinplup',i:394},{n:'Empoleon',i:395}] },
+        { t:'grass', p:[{n:'Snivy',i:495},{n:'Servine',i:496},{n:'Serperior',i:497}] }, { t:'fire', p:[{n:'Tepig',i:498},{n:'Pignite',i:499},{n:'Emboar',i:500}] }, { t:'water', p:[{n:'Oshawott',i:501},{n:'Dewott',i:502},{n:'Samurott',i:503}] },
+        { t:'grass', p:[{n:'Chespin',i:650},{n:'Quilladin',i:651},{n:'Chesnaught',i:652}] }, { t:'fire', p:[{n:'Fennekin',i:653},{n:'Braixen',i:654},{n:'Delphox',i:655}] }, { t:'water', p:[{n:'Froakie',i:656},{n:'Frogadier',i:657},{n:'Greninja',i:658}] },
+        { t:'grass', p:[{n:'Rowlet',i:722},{n:'Dartrix',i:723},{n:'Decidueye',i:724}] }, { t:'fire', p:[{n:'Litten',i:725},{n:'Torracat',i:726},{n:'Incineroar',i:727}] }, { t:'water', p:[{n:'Popplio',i:728},{n:'Brionne',i:729},{n:'Primarina',i:730}] },
+        { t:'grass', p:[{n:'Grookey',i:810},{n:'Thwackey',i:811},{n:'Rillaboom',i:812}] }, { t:'fire', p:[{n:'Scorbunny',i:813},{n:'Raboot',i:814},{n:'Cinderace',i:815}] }, { t:'water', p:[{n:'Sobble',i:816},{n:'Drizzile',i:817},{n:'Inteleon',i:818}] },
+        { t:'grass', p:[{n:'Sprigatito',i:906},{n:'Floragato',i:907},{n:'Meowscarada',i:908}] }, { t:'fire', p:[{n:'Fuecoco',i:909},{n:'Crocalor',i:910},{n:'Skeledirge',i:911}] }, { t:'water', p:[{n:'Quaxly',i:912},{n:'Quaxwell',i:913},{n:'Quaquaval',i:914}] }
+    ];
+    const wordData = [
+        { core: "FORM", items: [{ans:"INFORMATION", mask:"IN ____ ATION", p:"In-for-may-shun"}, {ans:"UNIFORM", mask:"UNI ____", p:"You-nih-form"}, {ans:"FORMATION", mask:"____ ATION", p:"For-may-shun"}] },
+        { core: "PLAY", items: [{ans:"PLAYGROUND", mask:"____ GROUND", p:"Play-ground"}, {ans:"REPLAY", mask:"RE ____", p:"Ree-play"}, {ans:"DISPLAY", mask:"DIS ____", p:"Diss-play"}] },
+        { core: "PORT", items: [{ans:"REPORT", mask:"RE ____", p:"Ree-port"}, {ans:"AIRPORT", mask:"AIR ____", p:"Air-port"}, {ans:"SUPPORT", mask:"SUP ____", p:"Sup-port"}] },
+        { core: "SIGN", items: [{ans:"DESIGN", mask:"DE ____", p:"Dee-zine"}, {ans:"SIGNAL", mask:"____ AL", p:"Sig-nal"}, {ans:"ASSIGN", mask:"AS ____", p:"Ah-zine"}] },
+        { core: "COVER", items: [{ans:"DISCOVERY", mask:"DIS ____ Y", p:"Diss-kov-er-ee"}, {ans:"RECOVER", mask:"RE ____", p:"Ree-kov-er"}, {ans:"UNCOVER", mask:"UN ____", p:"Un-kov-er"}] },
+        { core: "FLECT", items: [{ans:"REFLECTION", mask:"RE ____ ION", p:"Ree-flek-shun"}, {ans:"DEFLECT", mask:"DE ____", p:"Dee-flekt"}, {ans:"INFLECT", mask:"IN ____", p:"In-flekt"}] },
+        { core: "VENT", items: [{ans:"ADVENTURE", mask:"AD ____ URE", p:"Ad-ven-chur"}, {ans:"INVENT", mask:"IN ____", p:"In-vent"}, {ans:"PREVENT", mask:"PRE ____", p:"Pree-vent"}] },
+        { core: "CREATE", items: [{ans:"CREATION", mask:"____ ION", p:"Kree-ay-shun"}, {ans:"RECREATE", mask:"RE ____", p:"Ree-kree-ay-t"}, {ans:"CREATIVE", mask:"____ IVE", p:"Kree-ay-tiv"}] }
+    ];
+    const phoneticMap = { "FUECOCO": "Fway-koh-koh", "SKELEDIRGE": "Skell-eh-dirj", "SPRIGATITO": "Spreeg-ah-tee-toh", "IVYSAUR": "Ivy-sore", "BULBASAUR": "Bulba-sore", "VENUSAUR": "Veena-sore", "CHIKORITA": "Chick-oh-ree-tah", "CYNDAQUIL": "Sin-dah-kwill", "QUAXLY": "Kwaks-lee", "TOTODILE": "Toe-toh-dial" };
+    const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let isGameOver = false, masterWordDeck = [];
+
+    // Firework Engine
+    const canvas = document.getElementById('fireworks-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', initCanvas); initCanvas();
+    class Particle {
+        constructor(x, y, color) { this.x = x; this.y = y; this.color = color; this.velocity = { x: (Math.random() - 0.5) * 8, y: (Math.random() - 0.5) * 8 }; this.alpha = 1; this.friction = 0.95; }
+        draw() { ctx.globalAlpha = this.alpha; ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill(); }
+        update() { this.velocity.x *= this.friction; this.velocity.y *= this.friction; this.x += this.velocity.x; this.y += this.velocity.y; this.alpha -= 0.01; }
+    }
+    function createFirework(x, y) { const colors = ['#ff0000', '#ffd700', '#00ff00', '#00ffff', '#ff00ff', '#ffffff']; const color = colors[Math.floor(Math.random() * colors.length)]; for(let i=0; i<40; i++) particles.push(new Particle(x, y, color)); }
+    function animateFireworks() { ctx.clearRect(0, 0, canvas.width, canvas.height); if(isGameOver && Math.random() < 0.08) createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.4); particles.forEach((p, i) => { if(p.alpha <= 0) particles.splice(i, 1); else { p.update(); p.draw(); } }); requestAnimationFrame(animateFireworks); }
+    function playSfx(type) { if(audioCtx.state === 'suspended') audioCtx.resume(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); if(type === 'hit') { o.type='square'; o.frequency.setValueAtTime(800, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); o.start(); o.stop(audioCtx.currentTime + 0.1); } if(type === 'miss') { o.type='sawtooth'; o.frequency.setValueAtTime(80, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); o.start(); o.stop(audioCtx.currentTime + 0.4); } if(type === 'chiptune_evo') { for(let i=0; i<18; i++){ setTimeout(()=>{ const osc = audioCtx.createOscillator(); const gn = audioCtx.createGain(); osc.type = 'square'; osc.frequency.setValueAtTime(200 + (i * 45), audioCtx.currentTime); gn.gain.setValueAtTime(0.08, audioCtx.currentTime); gn.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.connect(gn); gn.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1); }, i * (220 - (i * 10))); } } }
+    function speakPromise(txt) { return new Promise((resolve) => { synth.cancel(); let corrected = txt; Object.keys(phoneticMap).forEach(k => corrected = corrected.replace(new RegExp(k, 'gi'), phoneticMap[k])); const u = new SpeechSynthesisUtterance(corrected); u.lang = 'en-GB'; u.rate = 0.85; u.onend = () => resolve(); setTimeout(resolve, 2000); synth.speak(u); }); }
+
+    let family, stageIdx, hp, matches, currentSet;
+    function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+
+    function handleTap(el, isCorrect, fullText, phonetic) {
+        if(el.classList.contains('matched')) return;
+        if(isCorrect) {
+            el.innerText = fullText; el.classList.add('matched'); matches++; playSfx('hit');
+            if(matches === 3) speakPromise(phonetic || fullText).then(() => setTimeout(handleEvo, 300)); else speakPromise(phonetic || fullText);
+        } else { el.classList.add('wrong'); hp -= 33.4; playSfx('miss'); document.getElementById('hp-fill').style.width = Math.max(0, hp) + "%"; if(hp <= 0) triggerDefeat(); setTimeout(() => el.classList.remove('wrong'), 500); }
+    }
+
+    function initStage() {
+        if(masterWordDeck.length === 0) masterWordDeck = shuffle([...wordData]);
+        currentSet = masterWordDeck.pop();
+        const p = family.p[stageIdx];
+        let baseTint = family.t === 'fire' ? 'rgba(255, 68, 34, 0.15)' : family.t === 'water' ? 'rgba(42, 117, 187, 0.15)' : 'rgba(76, 175, 80, 0.15)';
+        document.documentElement.style.setProperty('--type-tint', baseTint);
+        document.getElementById('poke-name-badge').innerText = p.n.toUpperCase();
+        document.getElementById('poke-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`;
+        document.getElementById('art-bg').className = `image-window bg-${family.t}`;
+        document.getElementById('core-fragment').innerText = currentSet.core;
+        speakPromise(currentSet.core);
+        const grid = document.getElementById('word-grid'); grid.innerHTML = ''; matches = 0;
+        let options = [];
+        currentSet.items.forEach(item => options.push({ text: item.mask, correct: true, full: item.ans, phonetic: item.p }));
+        let trapPool = shuffle(["CAT", "DOG", "SKY", "CAR", "HAT", "PIG", "BALL", "RUN", "FLY", "JET", "BOX", "TOP"]).slice(0, 5);
+        trapPool.forEach(t => options.push({ text: (Math.random() > 0.5 ? "____ "+t : t+" ____"), correct: false }));
+        shuffle(options).forEach(opt => { const div = document.createElement('div'); div.className = 'target'; div.innerText = opt.text; div.onclick = () => handleTap(div, opt.correct, opt.full, opt.phonetic); grid.appendChild(div); });
+    }
+
+    function triggerDefeat() { const overlay = document.getElementById('defeat-overlay'); const koImg = document.getElementById('ko-poke-img'); koImg.src = document.getElementById('poke-img').src; overlay.style.display = 'flex'; speakPromise("Oh no! Your Pokémon is exhausted. Don't give up!"); }
+    function handleEvo() { if(stageIdx < 2) { const oldN = family.p[stageIdx].n.toUpperCase(); stageIdx++; const newN = family.p[stageIdx].n.toUpperCase(); document.getElementById('status-msg').innerText = `${oldN} IS EVOLVING!`; document.getElementById('art-bg').classList.add('evo-tunnel'); playSfx('chiptune_evo'); setTimeout(() => { document.getElementById('status-msg').innerText = ""; document.getElementById('art-bg').classList.remove('evo-tunnel'); speakPromise(`${oldN} evolved into ${newN}!`).then(() => initStage()); }, 2600); } else { triggerFinale(); } }
+    function triggerFinale() { isGameOver = true; const overlay = document.getElementById('finale-overlay'), line = document.getElementById('evo-line-display'); line.innerHTML = ""; animateFireworks(); family.p.forEach((p, idx) => { setTimeout(() => { const img = document.createElement('img'); img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`; line.appendChild(img); createFirework(window.innerWidth/2 + (idx-1)*150, window.innerHeight/2); playSfx('hit'); }, idx * 600); }); overlay.style.display = 'flex'; speakPromise("Congratulations! You are a Pokémon Word Master!"); }
+    family = starterLibrary[Math.floor(Math.random()*starterLibrary.length)]; stageIdx = 0; hp = 100; initStage();
+</script>
+</body>
+</html>

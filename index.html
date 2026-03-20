@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PokéMorph v10.2</title>
+    <title>PokéMorph</title>
     <style>
         :root { 
             --card-gold: #ffd700;
@@ -13,7 +13,6 @@
             --poke-yellow: #ffcb05; --poke-blue: #3d7dca;
             --pokedex-red: #dc0a2d;
         }
-        /* iOS Safe Area Integration */
         html, body { 
             position: fixed; 
             overflow: hidden; 
@@ -21,8 +20,9 @@
             height: 100%; 
             margin: 0; 
             padding: 0; 
-            /* Push content down under Dynamic Island/Notch */
+            /* Critical for Home Screen Safe Area */
             padding-top: env(safe-area-inset-top, 20px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             box-sizing: border-box;
             touch-action: none; 
             background: #000; 
@@ -35,10 +35,10 @@
             user-select: none; 
         }
         
-        /* POKEBALL ICON - Adjusted for Top Margin */
+        /* POKEBALL ICON - Positioned with Safe Area Awareness */
         #pokedex-trigger { 
             position: fixed; 
-            top: calc(env(safe-area-inset-top, 20px) + 10px); 
+            top: calc(env(safe-area-inset-top, 20px) + 5px); 
             right: 15px; 
             width: 50px; height: 50px; 
             background: white; border: 4px solid #333; border-radius: 50%; 
@@ -48,7 +48,7 @@
         #pokedex-trigger::before { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
         #pokedex-trigger::after { content: ''; width: 14px; height: 14px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; }
 
-        /* SPLASH SCREEN */
+        /* START SCREEN */
         #start-gate { position: fixed; inset: 0; background: radial-gradient(circle, #1a1c2c 0%, #000 100%); z-index: 9000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .logo-text { font-size: 15vw; font-weight: 900; color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); text-shadow: 0 4px 0 var(--poke-blue); position: relative; }
         .logo-text::after { content: 'PokéMorph'; position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, #fff, var(--poke-yellow) 60%, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-text-stroke: 0; }
@@ -58,7 +58,7 @@
         /* MAIN POKEMON CARD */
         #pokemon-card { 
             width: 95vw; 
-            height: calc(95vh - env(safe-area-inset-top, 20px)); 
+            height: calc(98vh - env(safe-area-inset-top, 20px) - env(safe-area-inset-bottom, 10px));
             max-width: 500px; 
             background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; 
             padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; 
@@ -80,7 +80,7 @@
         .dot { width: 24px; height: 24px; background: #ccc; border-radius: 50%; border: 2px solid #888; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; }
         .dot.active { background: var(--hp-green); border-color: #1b5e20; color: white; transform: scale(1.1); }
 
-        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 5px; }
+        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 5px; flex-shrink: 0; }
         .target { background: #fff; border: 2px solid #555; padding: 10px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; min-height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #ccc; }
         .matched { background: var(--hp-green) !important; color: white !important; pointer-events: none; }
         .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; }
@@ -94,15 +94,13 @@
         #pokedex-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 20px 0; }
         .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
         .dex-entry.locked img { filter: brightness(0) contrast(0.5); opacity: 0.8; }
-        #pokedex-footer { padding: 10px; border-top: 2px solid white; display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 10px); }
-        .reset-icon-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: white; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+        #pokedex-footer { padding: 10px; border-top: 2px solid white; display: flex; justify-content: center; padding-bottom: calc(env(safe-area-inset-bottom, 10px) + 5px); }
+        .reset-icon-btn { background: none; border: none; font-size: 32px; cursor: pointer; color: white; }
 
         #evo-scene { position: fixed; inset: 0; z-index: 8000; display: none; background: radial-gradient(circle, #fff, #3a8cff, #000); flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        #evo-scene.active { display: flex; animation: rotateBg 1s infinite linear; }
         .game-overlay { display: none; position: absolute; inset: 0; z-index: 5000; flex-direction: column; align-items: center; justify-content: center; border-radius: 25px; padding: 20px; text-align: center; }
         
         #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8500; }
-        @keyframes rotateBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
         @keyframes shake { 0%, 100% {transform:translateX(0)} 20% {transform:translateX(-8px)} 80% {transform:translateX(8px)} }
         @keyframes pulsePlay { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     </style>
@@ -117,7 +115,7 @@
 </div>
 
 <div id="pokedex-view">
-    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;">
+    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px; min-height: 40px;">
         <h2 style="margin:0">POKÉDEX</h2>
         <div onclick="closeDex()" style="font-size:30px; cursor:pointer">X</div>
     </div>
@@ -136,10 +134,10 @@
 
 <div id="pokemon-card">
     <div id="finale-overlay" class="game-overlay" style="background: radial-gradient(circle, #2a0845, #000); color: gold;">
-        <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff); animation: pulsePlay 2s infinite;" src="">
+        <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src="">
         <div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0;">MEGA EVOLVED!</div>
         <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
-        <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px; font-size: 22px;" onclick="resetGame()">NEXT POKÉMON</button>
+        <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKÉMON</button>
     </div>
 
     <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;">
@@ -282,14 +280,15 @@
             return; 
         }
         const oldN = family.p[stageIdx].n; stageIdx++;
+        const newN = family.p[stageIdx].n;
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
-        evoImg.src = document.getElementById('poke-img').src; scene.classList.add('active'); playSfx('evo_build');
+        evoImg.src = document.getElementById('poke-img').src; scene.style.display='flex'; playSfx('evo_build');
         await speak(`${oldN} is evolving!`);
         for(let i=0; i<40; i++) particles.push({x:canvas.width/2, y:canvas.height/2, vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15, c:'#fff', l:1});
         evoImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.p[stageIdx].i}.png`;
         document.getElementById('evo-text').innerText = family.p[stageIdx].n.toUpperCase() + "!";
         await speak(`${oldN} evolved into ${family.p[stageIdx].n}!`);
-        setTimeout(() => { scene.classList.remove('active'); initStage(); }, 1000);
+        setTimeout(() => { scene.style.display='none'; initStage(); }, 1000);
     }
 
     function openDex() {

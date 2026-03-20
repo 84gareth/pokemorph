@@ -3,83 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PokeMorph">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png">
 
-    <title>PokeMorph</title>
+    <title>PokéMorph</title>
     <style>
         :root { 
             --card-gold: #d4af37; --hp-green: #4caf50; --hp-red: #ff4422; 
             --aura: rgba(255,255,255,0.5); --card-base: #fdfdfd;
             --type-tint: rgba(255,255,255,0.1);
+            --poke-yellow: #ffcb05; --poke-blue: #3d7dca;
         }
         html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; touch-action: none; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         body { font-family: 'Arial Rounded MT Bold', sans-serif; -webkit-user-select: none; user-select: none; }
         
-        #trainer-stats {
-            display: flex; gap: 20px; margin-bottom: 10px; z-index: 50;
-            background: rgba(255,255,255,0.1); padding: 10px 30px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+        /* CLEAN COSMIC START SCREEN */
+        #start-gate { 
+            position: fixed; inset: 0; 
+            background: 
+                radial-gradient(circle at 20% 20%, #2a0845 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, #191970 0%, transparent 40%),
+                linear-gradient(135deg, #000 0%, #0d1117 100%);
+            z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; 
         }
+        
+        /* THE CLEAR, FRIENDLY LOGO */
+        .logo-container { position: relative; margin-bottom: 50px; text-align: center; }
+        .logo-text { 
+            font-size: 80px; font-weight: 900; 
+            /* Multi-layer text styling for a 3D effect without skew */
+            color: var(--poke-yellow);
+            -webkit-text-stroke: 4px var(--poke-blue); 
+            text-shadow: 
+                0 4px 0 var(--poke-blue),
+                0 8px 15px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        /* A smooth yellow-to-orange gradient fill */
+        .logo-text::after {
+            content: 'PokéMorph';
+            position: absolute;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #fff 0%, var(--poke-yellow) 40%, var(--poke-yellow) 60%, #ff8c00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 0;
+            z-index: 1;
+        }
+
+        .play-icon-btn { 
+            width: 140px; height: 140px; background: white; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; box-shadow: 0 0 30px rgba(255,255,255,0.3); 
+            animation: pulsePlay 2s infinite; position: relative; z-index: 2;
+        }
+        .play-triangle { 
+            width: 0; height: 0; 
+            border-top: 30px solid transparent; border-bottom: 30px solid transparent; 
+            border-left: 50px solid var(--poke-blue); 
+            margin-left: 10px; 
+        }
+
+        @keyframes pulsePlay { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        /* DASHBOARD & CARD STYLES */
+        #trainer-stats { display: flex; gap: 20px; margin-bottom: 8px; z-index: 50; background: rgba(255,255,255,0.1); padding: 8px 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
         .stat-box { text-align: center; color: white; }
-        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-        .stat-value { font-size: 24px; font-weight: 900; }
-        .current-val { color: #00d4ff; }
-        .best-val { color: #ffd700; }
+        .stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        .stat-value { font-size: 20px; font-weight: 900; }
 
         #pokemon-card { 
             width: 98vw; height: 88vh; max-width: 650px; max-height: 850px; 
             background: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 10px),
                         radial-gradient(circle at 50% 30%, var(--type-tint) 0%, var(--card-base) 70%);
-            border: 12px solid var(--card-gold); border-radius: 45px; padding: 15px; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 70px rgba(255,255,255,0.2); box-sizing: border-box; z-index: 10;
+            border: 10px solid var(--card-gold); border-radius: 40px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10;
         }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; z-index: 20; }
-        #poke-name-badge { background: linear-gradient(to bottom, #ffd700, #b8860b); color: #111; padding: 4px 20px; border-radius: 50px; font-size: 20px; font-weight: 900; border: 2px solid #fff; box-shadow: 2px 3px 0px rgba(0,0,0,0.2); }
-        .hp-bar { width: 120px; height: 16px; background: #222; border-radius: 10px; border: 2px solid #000; overflow: hidden; }
-        #hp-fill { width: 100%; height: 100%; background: var(--hp-green); transition: width 0.5s ease; }
+        #poke-name-badge { background: linear-gradient(to bottom, #ffd700, #b8860b); color: #111; padding: 4px 18px; border-radius: 50px; font-size: 18px; font-weight: 900; border: 2px solid #fff; box-shadow: 2px 3px 0px rgba(0,0,0,0.2); }
+        .hp-bar { width: 110px; height: 14px; background: #222; border-radius: 10px; border: 2px solid #000; overflow: hidden; }
+        #hp-fill { width: 100%; height: 100%; background: var(--hp-green); transition: width 0.4s ease, background 0.3s; }
 
-        .image-window { width: 100%; flex-grow: 10; border: 6px solid #444; border-radius: 30px; position: relative; overflow: hidden; background: #222; z-index: 1; box-shadow: inset 0 0 30px #000; margin-bottom: 10px; }
-        .bg-fire { background: radial-gradient(circle at center, #ff8c00, #ff4e50, #222); }
-        .bg-water { background: radial-gradient(circle at center, #6dd5fa, #2980b9, #111); }
-        .bg-grass { background: radial-gradient(circle at center, #a8e063, #56ab2f, #111); }
-
-        #poke-img { position: absolute; height: 92%; left: 50%; top: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 25px white); pointer-events: none; z-index: 10; }
+        .image-window { width: 100%; flex-grow: 10; border: 5px solid #444; border-radius: 25px; position: relative; overflow: hidden; background: #222; z-index: 1; box-shadow: inset 0 0 30px #000; margin-bottom: 8px; }
+        #poke-img { position: absolute; height: 92%; left: 50%; top: 50%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 20px white); pointer-events: none; z-index: 10; }
         #status-msg { position: absolute; top: 15%; width: 100%; text-align: center; color: #fff; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 10px #000; z-index: 15; pointer-events: none; }
 
-        #gameplay-ui { display: flex; flex-direction: column; flex-grow: 1; }
-        #core-fragment { width: 45%; height: 50px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px auto; border: 3px solid #fff; box-shadow: 0 5px 0 #000; z-index: 20; }
-        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 10px; z-index: 20; }
-        .target { background: linear-gradient(to bottom, #fff, #e0e0e0); border: 2px solid #666; padding: 8px; border-radius: 12px; font-size: 15px; color: #333; text-align: center; font-weight: bold; cursor: pointer; transition: background 0.2s, transform 0.1s; box-shadow: 0 3px 0 #999; display: flex; align-items: center; justify-content: center; min-height: 38px; }
+        #core-area { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px; }
+        #core-fragment { width: 160px; height: 55px; background: #222; color: #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid #fff; box-shadow: 0 5px 0 #000; }
+        .replay-btn { width: 50px; height: 50px; background: #00d4ff; border: 3px solid #fff; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #008ba3; font-size: 24px; color: white; }
         
+        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 10px; z-index: 20; }
+        .target { background: linear-gradient(to bottom, #fff, #e0e0e0); border: 2px solid #666; padding: 10px; border-radius: 12px; font-size: 15px; color: #333; text-align: center; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #999; display: flex; align-items: center; justify-content: center; min-height: 40px; }
         .matched { background: var(--hp-green) !important; color: white !important; border-color: #1b5e20 !important; box-shadow: 0 3px 0 #1b5e20 !important; pointer-events: none; }
-        .wrong { background: var(--hp-red) !important; color: white !important; border-color: #8b0000 !important; box-shadow: 0 3px 0 #8b0000 !important; animation: shake 0.4s; }
+        .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; }
 
         .game-overlay { display: none; position: absolute; inset: 0; z-index: 3000; flex-direction: column; align-items: center; justify-content: center; border-radius: 35px; padding: 20px; text-align: center; }
         #finale-overlay { background: radial-gradient(circle, #2a0845, #000000); color: gold; }
         #defeat-overlay { background: radial-gradient(circle, #222, #000); color: #fff; }
-        .next-btn { background: linear-gradient(to bottom, #ffd700, #ff8c00); color: #fff; padding: 20px 50px; font-size: 28px; font-weight: 900; text-transform: uppercase; border: 5px solid #fff; border-radius: 40px; cursor: pointer; box-shadow: 0 10px 0 #b8860b; animation: pulseBtn 2s infinite; }
         
         #fireworks-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 2500; }
-        @keyframes pulseBtn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes shake { 0%, 100% {transform:translateX(0)} 20% {transform:translateX(-12px)} 80% {transform:translateX(12px)} }
+        @keyframes shake { 0%, 100% {transform:translateX(0)} 20% {transform:translateX(-10px)} 80% {transform:translateX(10px)} }
         .evo-tunnel { background: radial-gradient(circle, #fff, #3a8cff, #000) !important; animation: rotateBg 0.5s infinite linear !important; }
         @keyframes rotateBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<div id="start-gate">
+    <div class="logo-container">
+        <div class="logo-text">PokéMorph</div>
+    </div>
+    <div class="play-icon-btn" onclick="startGame()">
+        <div class="play-triangle"></div>
+    </div>
+</div>
+
 <div id="trainer-stats">
     <div class="stat-box">
-        <div class="stat-label">Current Streak</div>
-        <div id="current-streak" class="stat-value current-val">0</div>
+        <div class="stat-label">Streak</div>
+        <div id="current-streak" class="stat-value" style="color:#00d4ff">0</div>
     </div>
     <div class="stat-box">
-        <div class="stat-label">Best Streak</div>
-        <div id="best-streak" class="stat-value best-val">0</div>
+        <div class="stat-label">Best</div>
+        <div id="best-streak" class="stat-value" style="color:#ffd700">0</div>
     </div>
 </div>
 
@@ -87,68 +138,74 @@
 
 <div id="pokemon-card">
     <div id="finale-overlay" class="game-overlay">
-        <h1 style="font-size: 50px; margin: 0;">CHAMPION!</h1>
-        <div class="evo-line" id="evo-line-display" style="display:flex; gap:10px; margin:20px 0;"></div>
-        <button class="next-btn" onclick="location.reload()">NEXT POKÉMON</button>
+        <div style="font-size: 32px; margin-bottom:15px;" id="mega-announcement">MEGA EVOLVED!</div>
+        <img id="mega-img-large" style="width: 180px; filter: drop-shadow(0 0 30px #fff); margin-bottom: 20px;" src="">
+        <div id="evo-line-display" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
+        <button class="target" style="background: linear-gradient(to bottom, #ffd700, #ff8c00); padding: 15px 40px; border-radius: 30px; color: white; font-size: 24px; border: 4px solid #fff;" onclick="location.reload()">NEXT TEAM</button>
     </div>
 
     <div id="defeat-overlay" class="game-overlay">
         <h1 style="font-size: 40px; margin: 0; color: var(--hp-red);">OH NO!</h1>
-        <p style="font-size: 18px;">Streak Reset!</p>
-        <button class="target" style="background: red; color: white; padding: 15px 30px; border-radius: 20px; width: 60%; margin: 0 auto;" onclick="location.reload()">TRY AGAIN</button>
-    </div>
+        <button class="target" style="background: red; color: white; padding: 15px 30px; border-radius: 20px; margin-top: 20px; width: 60%; margin: 20px auto 0;" onclick="location.reload()">TRY AGAIN</button>
+        </div>
 
     <div class="header">
         <div id="poke-name-badge">NAME</div>
         <div class="hp-bar"><div id="hp-fill"></div></div>
     </div>
-    <div id="art-bg" class="image-window">
+    <div id="art-bg" class="image-window bg-fire">
         <div id="status-msg"></div>
         <img id="poke-img" src="" alt="">
     </div>
+
     <div id="gameplay-ui">
-        <div id="core-fragment">ROOT</div>
+        <div id="core-area">
+            <button class="replay-btn" onclick="replaySound()">🔊</button>
+            <div id="core-fragment">...</div>
+        </div>
         <div id="word-grid"></div>
     </div>
 </div>
 
 <script>
-    const starterLibrary = [
-        { t:'grass', p:[{n:'Bulbasaur',i:1},{n:'Ivysaur',i:2},{n:'Venusaur',i:3}] }, { t:'fire', p:[{n:'Charmander',i:4},{n:'Charmeleon',i:5},{n:'Charizard',i:6}] }, { t:'water', p:[{n:'Squirtle',i:7},{n:'Wartortle',i:8},{n:'Blastoise',i:9}] },
-        { t:'grass', p:[{n:'Chikorita',i:152},{n:'Bayleef',i:153},{n:'Meganium',i:154}] }, { t:'fire', p:[{n:'Cyndaquil',i:155},{n:'Quilava',i:156},{n:'Typhlosion',i:157}] }, { t:'water', p:[{n:'Totodile',i:158},{n:'Croconaw',i:159},{n:'Feraligatr',i:160}] },
-        { t:'grass', p:[{n:'Treecko',i:252},{n:'Grovyle',i:253},{n:'Sceptile',i:254}] }, { t:'fire', p:[{n:'Torchic',i:255},{n:'Combusken',i:256},{n:'Blaziken',i:257}] }, { t:'water', p:[{n:'Mudkip',i:258},{n:'Marshtomp',i:259},{n:'Swampert',i:260}] },
-        { t:'grass', p:[{n:'Turtwig',i:387},{n:'Grotle',i:388},{n:'Torterra',i:389}] }, { t:'fire', p:[{n:'Chimchar',i:390},{n:'Monferno',i:391},{n:'Infernape',i:392}] }, { t:'water', p:[{n:'Piplup',i:393},{n:'Prinplup',i:394},{n:'Empoleon',i:395}] },
-        { t:'grass', p:[{n:'Snivy',i:495},{n:'Servine',i:496},{n:'Serperior',i:497}] }, { t:'fire', p:[{n:'Tepig',i:498},{n:'Pignite',i:499},{n:'Emboar',i:500}] }, { t:'water', p:[{n:'Oshawott',i:501},{n:'Dewott',i:502},{n:'Samurott',i:503}] },
-        { t:'grass', p:[{n:'Chespin',i:650},{n:'Quilladin',i:651},{n:'Chesnaught',i:652}] }, { t:'fire', p:[{n:'Fennekin',i:653},{n:'Braixen',i:654},{n:'Delphox',i:655}] }, { t:'water', p:[{n:'Froakie',i:656},{n:'Frogadier',i:657},{n:'Greninja',i:658}] },
-        { t:'grass', p:[{n:'Rowlet',i:722},{n:'Dartrix',i:723},{n:'Decidueye',i:724}] }, { t:'fire', p:[{n:'Litten',i:725},{n:'Torracat',i:726},{n:'Incineroar',i:727}] }, { t:'water', p:[{n:'Popplio',i:728},{n:'Brionne',i:729},{n:'Primarina',i:730}] },
-        { t:'grass', p:[{n:'Grookey',i:810},{n:'Thwackey',i:811},{n:'Rillaboom',i:812}] }, { t:'fire', p:[{n:'Scorbunny',i:813},{n:'Raboot',i:814},{n:'Cinderace',i:815}] }, { t:'water', p:[{n:'Sobble',i:816},{n:'Drizzile',i:817},{noleOn:'Inteleon',i:818}] },
-        { t:'grass', p:[{n:'Sprigatito',i:906},{n:'Floragato',i:907},{n:'Meowscarada',i:908}] }, { t:'fire', p:[{n:'Fuecoco',i:909},{n:'Crocalor',i:910},{n:'Skeledirge',i:911}] }, { t:'water', p:[{n:'Quaxly',i:912},{n:'Quaxwell',i:913},{n:'Quaquaval',i:914}] }
+    const megaLibrary = [
+        { t:'fire', p:[{n:'Charmander',i:4},{n:'Charmeleon',i:5},{n:'Charizard',i:6}], mega:{n:'Mega Charizard X', i:10034} },
+        { t:'water', p:[{n:'Squirtle',i:7},{n:'Wartortle',i:8},{n:'Blastoise',i:9}], mega:{n:'Mega Blastoise', i:10035} },
+        { t:'grass', p:[{n:'Bulbasaur',i:1},{n:'Ivysaur',i:2},{n:'Venusaur',i:3}], mega:{n:'Mega Venusaur', i:10033} },
+        { t:'grass', p:[{n:'Treecko',i:252},{n:'Grovyle',i:253},{n:'Sceptile',i:254}], mega:{n:'Mega Sceptile', i:10065} },
+        { t:'fire', p:[{n:'Torchic',i:255},{n:'Combusken',i:256},{n:'Blaziken',i:257}], mega:{n:'Mega Blaziken', i:10050} },
+        { t:'water', p:[{n:'Mudkip',i:258},{n:'Marshtomp',i:259},{n:'Swampert',i:260}], mega:{n:'Mega Swampert', i:10064} },
+        { t:'fire', p:[{n:'Gastly',i:92},{n:'Haunter',i:93},{n:'Gengar',i:94}], mega:{n:'Mega Gengar', i:10038} },
+        { t:'fire', p:[{n:'Pidgey',i:16},{n:'Pidgeotto',i:17},{n:'Pidgeot',i:18}], mega:{n:'Mega Pidgeot', i:10073} },
+        { t:'water', p:[{n:'Aron',i:304},{n:'Lairon',i:305},{n:'Aggron',i:306}], mega:{n:'Mega Aggron', i:10053} },
+        { t:'fire', p:[{n:'Larvitar',i:246},{n:'Pupitar',i:247},{n:'Tyranitar',i:248}], mega:{n:'Mega Tyranitar', i:10055} },
+        { t:'water', p:[{n:'Bagon',i:371},{n:'Shelgon',i:372},{n:'Salamence',i:373}], mega:{n:'Mega Salamence', i:10074} },
+        { t:'fire', p:[{n:'Beldum',i:374},{n:'Metang',i:375},{n:'Metagross',i:376}], mega:{n:'Mega Metagross', i:10076} },
+        { t:'water', p:[{n:'Gible',i:443},{n:'Gabite',i:444},{n:'Garchomp',i:445}], mega:{n:'Mega Garchomp', i:10058} },
+        { t:'grass', p:[{n:'Mareep',i:179},{n:'Flaaffy',i:180},{n:'Ampharos',i:181}], mega:{n:'Mega Ampharos', i:10045} }
     ];
 
     const wordData = [
         { core: "FORM", items: [{ans:"INFORMATION", mask:"IN ____ ATION", p:"In-for-may-shun"}, {ans:"UNIFORM", mask:"UNI ____", p:"You-nih-form"}, {ans:"FORMATION", mask:"____ ATION", p:"For-may-shun"}] },
         { core: "PLAY", items: [{ans:"PLAYGROUND", mask:"____ GROUND", p:"Play-ground"}, {ans:"REPLAY", mask:"RE ____", p:"Ree-play"}, {ans:"DISPLAY", mask:"DIS ____", p:"Diss-play"}] },
-        { core: "PORT", items: [{ans:"REPORT", mask:"RE ____", p:"Ree-port"}, {ans:"AIRPORT", mask:"AIR ____", p:"Air-port"}, {ans:"SUPPORT", mask:"SUP ____", p:"Sup-port"}] },
         { core: "SIGN", items: [{ans:"DESIGN", mask:"DE ____", p:"Dee-zine"}, {ans:"SIGNAL", mask:"____ AL", p:"Sig-nal"}, {ans:"ASSIGN", mask:"AS ____", p:"Ah-zine"}] },
-        { core: "COVER", items: [{ans:"DISCOVERY", mask:"DIS ____ Y", p:"Diss-kov-er-ee"}, {ans:"RECOVER", mask:"RE ____", p:"Ree-kov-er"}, {ans:"UNCOVER", mask:"UN ____", p:"Un-kov-er"}] },
-        { core: "FLECT", items: [{ans:"REFLECTION", mask:"RE ____ ION", p:"Ree-flek-shun"}, {ans:"DEFLECT", mask:"DE ____", p:"Dee-flekt"}, {ans:"INFLECT", mask:"IN ____", p:"In-flekt"}] },
-        { core: "VENT", items: [{ans:"ADVENTURE", mask:"AD ____ URE", p:"Ad-ven-chur"}, {ans:"INVENT", mask:"IN ____", p:"In-vent"}, {ans:"PREVENT", mask:"PRE ____", p:"Pree-vent"}] },
-        { core: "CREATE", items: [{ans:"CREATION", mask:"____ ION", p:"Kree-ay-shun"}, {ans:"RECREATE", mask:"RE ____", p:"Ree-kree-ay-t"}, {ans:"CREATIVE", mask:"____ IVE", p:"Kree-ay-tiv"}] },
-        { core: "TRACT", items: [{ans:"ATTRACTION", mask:"AT ____ ION", p:"Ah-trak-shun"}, {ans:"CONTRACT", mask:"CON ____", p:"Con-trakt"}, {ans:"SUBTRACT", mask:"SUB ____", p:"Sub-trakt"}] },
-        { core: "SPECT", items: [{ans:"INSPECT", mask:"IN ____", p:"In-spekt"}, {ans:"RESPECT", mask:"RE ____", p:"Ree-spekt"}, {ans:"SPECTACLE", mask:"____ ACLE", p:"Spek-tah-kul"}] },
         { core: "STRUCT", items: [{ans:"CONSTRUCT", mask:"CON ____", p:"Con-strukt"}, {ans:"INSTRUCTION", mask:"IN ____ ION", p:"In-struk-shun"}, {ans:"STRUCTURE", mask:"____ URE", p:"Struk-chur"}] },
-        { core: "PRESS", items: [{ans:"EXPRESS", mask:"EX ____", p:"Ex-press"}, {ans:"IMPRESS", mask:"IM ____", p:"Im-press"}, {ans:"PRESSURE", mask:"____ URE", p:"Presh-er"}] },
-        { core: "JECT", items: [{ans:"PROJECTOR", mask:"PRO ____ OR", p:"Pro-jek-tor"}, {ans:"REJECT", mask:"RE ____", p:"Ree-jekt"}, {ans:"INJECT", mask:"IN ____", p:"In-jekt"}] }
+        { core: "PRESS", items: [{ans:"EXPRESS", mask:"EX ____", p:"Ex-press"}, {ans:"IMPRESS", mask:"IM ____", p:"Im-press"}, {ans:"PRESSURE", mask:"____ URE", p:"Presh-er"}] }
     ];
 
-    const trapPool = ["CAT", "DOG", "SKY", "CAR", "HAT", "PIG", "BALL", "RUN", "FLY", "JET", "BOX", "TOP", "BIG", "RED", "SUN", "FUN", "WIN", "LOG", "MUD", "TEN", "POT", "NET", "MAP", "BAT", "FAN", "GAP", "HIP", "JAM", "LIP", "MIX", "NOD", "OWL", "PEN", "RAT", "SAD", "TUB", "VAN", "WEB", "YAK", "ZOO", "ZIP", "ARM", "EGG", "ICE"];
-
-    const phoneticMap = { "FUECOCO": "Fway-koh-koh", "SKELEDIRGE": "Skell-eh-dirj", "SPRIGATITO": "Spreeg-ah-tee-toh", "IVYSAUR": "Ivy-sore", "BULBASAUR": "Bulba-sore", "VENUSAUR": "Veena-sore", "CHIKORITA": "Chick-oh-ree-tah", "CYNDAQUIL": "Sin-dah-kwill", "QUAXLY": "Kwaks-lee", "TOTODILE": "Toe-toh-dial", "MEOWSCARADA": "Me-ow-skah-rah-dah", "FLECT": "Flekt", "VENT": "Vent", "STRUCT": "Strukt", "SPECT": "Spekt", "JECT": "Jekt", "TRACT": "Trakt" };
+    const trapPool = ["CAT", "DOG", "SKY", "CAR", "HAT", "PIG", "BALL", "RUN", "FLY", "JET", "BOX", "TOP", "BIG", "RED", "SUN", "FUN", "WIN", "MAP", "BAT", "VAN"];
+    const phoneticMap = { "FUECOCO": "Fway-koh-koh", "SKELEDIRGE": "Skell-eh-dirj", "STRUCT": "Strukt", "SPECT": "Spekt", "JECT": "Jekt", "TRACT": "Trakt" };
 
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let isGameOver = false, masterWordDeck = [], family, stageIdx, hp, matches, currentSet;
+    let isGameOver = false, masterWordDeck = [], family, stageIdx, hp = 100, currentSet;
     let streak = parseInt(sessionStorage.getItem('pokeStreak')) || 0;
     let bestStreak = parseInt(localStorage.getItem('pokeBestStreak')) || 0;
+
+    function startGame() { 
+        document.getElementById('start-gate').style.display = 'none';
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        initStage();
+    }
 
     const canvas = document.getElementById('fireworks-canvas');
     const ctx = canvas.getContext('2d');
@@ -159,22 +216,15 @@
     function createFirework(x, y) { const colors = ['#ff0000', '#ffd700', '#00ff00', '#00ffff', '#ff00ff', '#ffffff']; const color = colors[Math.floor(Math.random() * colors.length)]; for(let i=0; i<40; i++) particles.push(new Particle(x, y, color)); }
     function animateFireworks() { ctx.clearRect(0, 0, canvas.width, canvas.height); if(isGameOver && Math.random() < 0.08) createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.4); particles.forEach((p, i) => { if(p.alpha <= 0) particles.splice(i, 1); else { p.update(); p.draw(); } }); requestAnimationFrame(animateFireworks); }
     
-    function updateStreakDisplay() {
-        document.getElementById('current-streak').innerText = streak;
-        document.getElementById('best-streak').innerText = bestStreak;
-    }
-
     function playSfx(type) {
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination);
-        if(type === 'hit') { o.type='square'; o.frequency.setValueAtTime(800, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); o.start(); o.stop(audioCtx.currentTime + 0.1); }
-        if(type === 'miss') { o.type='sawtooth'; o.frequency.setValueAtTime(80, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); o.start(); o.stop(audioCtx.currentTime + 0.4); }
+        if(type === 'hit') { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type='square'; o.frequency.setValueAtTime(800, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); o.start(); o.stop(audioCtx.currentTime + 0.1); }
+        if(type === 'miss') { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.type='sawtooth'; o.frequency.setValueAtTime(80, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); o.start(); o.stop(audioCtx.currentTime + 0.4); }
         if(type === 'evo_build') {
             for(let i=0; i<30; i++) {
                 const t = audioCtx.currentTime + (i * 3.0 / 30);
                 const osc = audioCtx.createOscillator(), gn = audioCtx.createGain();
-                osc.type = 'square'; osc.frequency.setValueAtTime(200 + (i * 40), t);
-                gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                osc.type = 'square'; osc.frequency.setValueAtTime(200 + (i * 45), t);
+                gn.gain.setValueAtTime(0.06, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
                 osc.connect(gn); gn.connect(audioCtx.destination);
                 osc.start(t); osc.stop(t + 0.08);
             }
@@ -194,13 +244,14 @@
         }); 
     }
 
+    function replaySound() { if(currentSet) speakPromise(currentSet.core); }
     function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
 
     function handleTap(el, isCorrect, fullText, phonetic) {
         if(el.classList.contains('matched') || el.classList.contains('wrong')) return;
         if(isCorrect) {
-            el.innerText = fullText; el.classList.add('matched'); matches++; playSfx('hit');
-            if(matches === 3) speakPromise(phonetic || fullText).then(() => setTimeout(handleEvo, 300)); else speakPromise(phonetic || fullText);
+            el.innerText = fullText; el.classList.add('matched'); playSfx('hit');
+            if(gridMatches() === 3) speakPromise(phonetic || fullText).then(() => setTimeout(handleEvo, 300)); else speakPromise(phonetic || fullText);
         } else { 
             el.classList.add('wrong'); hp -= 33.4; playSfx('miss'); 
             document.getElementById('hp-fill').style.width = Math.max(0, hp) + "%"; 
@@ -208,42 +259,46 @@
             setTimeout(() => el.classList.remove('wrong'), 500); 
         }
     }
+    function gridMatches() { return document.querySelectorAll('.matched').length; }
 
     async function initStage() {
         if(masterWordDeck.length === 0) masterWordDeck = shuffle([...wordData]);
         currentSet = masterWordDeck.pop();
         const p = family.p[stageIdx];
+        
+        hp = 100;
+        document.getElementById('hp-fill').style.width = "100%";
+        document.getElementById('hp-fill').style.background = "#fff";
+        setTimeout(() => document.getElementById('hp-fill').style.background = "var(--hp-green)", 400);
+
         document.getElementById('poke-name-badge').innerText = p.n.toUpperCase();
         document.getElementById('poke-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`;
-        document.getElementById('art-bg').className = `image-window bg-${family.t}`;
+        document.documentElement.style.setProperty('--type-tint', family.t === 'fire' ? 'rgba(255, 68, 34, 0.15)' : family.t === 'water' ? 'rgba(42, 117, 187, 0.15)' : 'rgba(76, 175, 80, 0.15)');
         document.getElementById('core-fragment').innerText = currentSet.core;
-        const grid = document.getElementById('word-grid'); grid.innerHTML = ''; matches = 0;
+        
+        const grid = document.getElementById('word-grid'); grid.innerHTML = ''; 
         let options = [];
         currentSet.items.forEach(item => options.push({ text: item.mask, correct: true, full: item.ans, phonetic: item.p }));
         let localTraps = shuffle([...trapPool]).slice(0, 5);
         localTraps.forEach(t => options.push({ text: (Math.random() > 0.5 ? "____ "+t : t+" ____"), correct: false }));
         shuffle(options).forEach(opt => { const div = document.createElement('div'); div.className = 'target'; div.innerText = opt.text; div.onclick = () => handleTap(div, opt.correct, opt.full, opt.phonetic); grid.appendChild(div); });
+        
         await speakPromise(currentSet.core);
     }
 
-    function triggerDefeat() { 
-        streak = 0; sessionStorage.setItem('pokeStreak', 0); updateStreakDisplay();
-        document.getElementById('defeat-overlay').style.display = 'flex'; 
-        speakPromise("Oh no! Your Pokémon is exhausted. Streak reset!"); 
-    }
+    function triggerDefeat() { streak = 0; sessionStorage.setItem('pokeStreak', 0); updateDisplay(); document.getElementById('defeat-overlay').style.display = 'flex'; speakPromise("Oh no!"); }
     
     async function handleEvo() { 
-        // Update Streak for EVERY evolution
-        streak++;
-        sessionStorage.setItem('pokeStreak', streak);
+        streak++; sessionStorage.setItem('pokeStreak', streak);
         if(streak > bestStreak) { bestStreak = streak; localStorage.setItem('pokeBestStreak', bestStreak); }
-        updateStreakDisplay();
+        updateDisplay();
 
         if(stageIdx < 2) { 
             const oldN = family.p[stageIdx].n.toUpperCase(); stageIdx++; const newN = family.p[stageIdx].n.toUpperCase(); 
             document.getElementById('status-msg').innerText = "What?"; 
             document.getElementById('art-bg').classList.add('evo-tunnel'); 
             playSfx('evo_build'); await speakPromise(`${oldN} is evolving!`); 
+            
             setTimeout(async () => { 
                 document.getElementById('status-msg').innerText = ""; 
                 document.getElementById('art-bg').classList.remove('evo-tunnel'); 
@@ -256,13 +311,19 @@
 
     function triggerFinale() { 
         isGameOver = true;
-        const overlay = document.getElementById('finale-overlay'), line = document.getElementById('evo-line-display'); line.innerHTML = "";
-        family.p.forEach((p, idx) => { setTimeout(() => { const img = document.createElement('img'); img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`; img.style.width="100px"; line.appendChild(img); createFirework(window.innerWidth/2 + (idx-1)*120, window.innerHeight/2); playSfx('hit'); }, idx * 600); });
-        overlay.style.display = 'flex'; speakPromise("Congratulations! You are a Pokémon Word Master!"); 
+        const overlay = document.getElementById('finale-overlay');
+        const megaImg = document.getElementById('mega-img-large');
+        megaImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.mega.i}.png`;
+        document.getElementById('mega-announcement').innerText = `${family.mega.n.toUpperCase()} MEGA EVOLVED!`;
+        const line = document.getElementById('evo-line-display'); line.innerHTML = "";
+        family.p.forEach(p => { const img = document.createElement('img'); img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`; img.style.width="60px"; line.appendChild(img); });
+        overlay.style.display = 'flex'; speakPromise(`${family.p[2].n} Mega Evolved! You are a Mega Master!`); 
     }
     
-    updateStreakDisplay();
-    family = starterLibrary[Math.floor(Math.random()*starterLibrary.length)]; stageIdx = 0; hp = 100; initStage();
+    function updateDisplay() { document.getElementById('current-streak').innerText = streak; document.getElementById('best-streak').innerText = bestStreak; }
+    
+    updateDisplay();
+    family = megaLibrary[Math.floor(Math.random()*megaLibrary.length)]; stageIdx = 0; 
     animateFireworks();
 </script>
 </body>

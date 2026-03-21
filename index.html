@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
 
-    <title>PokéMorph v12.3</title>
+    <title>PokéMorph v13.0</title>
     <style>
         :root { 
             --card-gold: #ffd700;
@@ -23,46 +21,50 @@
         
         #start-gate { position: fixed; inset: 0; background: #3d7dca; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         #sunburst { position: absolute; width: 200%; height: 200%; background: repeating-conic-gradient(from 0deg, #3d7dca 0deg 20deg, #4b8fe0 20deg 40deg); animation: rotateSun 20s linear infinite; opacity: 0.6; }
-        .logo-container { position: relative; animation: float 3s ease-in-out infinite; text-align: center; z-index: 5; }
-        .logo-text { font-family: var(--game-font); font-size: 18vw; color: var(--poke-yellow); -webkit-text-stroke: 3px var(--poke-blue); filter: drop-shadow(0 10px 0 var(--poke-blue)); margin: 0 0 20px 0; letter-spacing: 2px; }
-        
-        .play-icon-btn { width: 110px; height: 110px; background: var(--poke-blue); border: 6px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.4); animation: pulsePlay 1.5s infinite; }
-        .play-triangle { width: 0; height: 0; border-top: 20px solid transparent; border-bottom: 20px solid transparent; border-left: 35px solid white; margin-left: 12px; }
+        .logo-container { position: relative; animation: float 3s ease-in-out infinite; text-align: center; z-index: 5; width: 90%; max-width: 500px; }
+        .logo-text { font-family: var(--game-font); font-size: clamp(40px, 15vw, 100px); color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); filter: drop-shadow(0 8px 0 var(--poke-blue)); margin-bottom: 20px; letter-spacing: 2px; }
+        .play-icon-btn { width: 100px; height: 100px; background: var(--poke-blue); border: 6px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.4); animation: pulsePlay 1.5s infinite; }
+        .play-triangle { width: 0; height: 0; border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 30px solid white; margin-left: 10px; }
 
-        #game-view { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: env(safe-area-inset-top, 20px); padding-bottom: env(safe-area-inset-bottom, 10px); box-sizing: border-box; }
-        #pokedex-trigger { position: fixed; top: calc(env(safe-area-inset-top, 20px) + 5px); right: 15px; width: 50px; height: 50px; background: white; border: 4px solid #333; border-radius: 50%; z-index: 100; cursor: pointer; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        #pokedex-trigger::before { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
+        #pokedex-trigger { position: fixed; top: calc(env(safe-area-inset-top, 20px) + 5px); right: 15px; width: 50px; height: 50px; background: white; border: 4px solid #333; border-radius: 50%; z-index: 100; cursor: pointer; overflow: hidden; }
+        #pokedex-trigger::before { content: ''; width: 100%; height: 6px; background: #333; position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1; }
+        #pokedex-trigger::after { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
+        #poke-btn-white { width: 14px; height: 14px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
+
+        #game-view { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: env(safe-area-inset-top, 20px) 10px env(safe-area-inset-bottom, 10px); box-sizing: border-box; }
+        #pokemon-card { width: 98vw; height: 92vh; max-width: 500px; background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; }
         
-        #pokemon-card { width: 95vw; height: 85vh; max-width: 500px; background: #fdfdfd; border: 8px solid var(--card-gold); border-radius: 35px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box; z-index: 10; }
-        #poke-name-badge { font-family: var(--game-font); font-size: 24px; color: #333; background: linear-gradient(to bottom, #fff, #ffd700); padding: 5px 20px; border-radius: 20px; border: 3px solid #333; box-shadow: 0 4px 0 rgba(0,0,0,0.2); text-transform: uppercase; }
-        .hp-bar { width: 120px; height: 20px; background: #222; border-radius: 12px; border: 3px solid #000; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; width: 100%; flex-shrink: 0; }
+        #poke-name-badge { font-family: var(--game-font); font-size: 20px; color: #333; background: linear-gradient(to bottom, #fff, #ffd700); padding: 4px 15px; border-radius: 12px; border: 3px solid #333; text-transform: uppercase; }
+        .hp-bar-outer { width: 100px; height: 16px; background: #222; border-radius: 10px; border: 2.5px solid #000; overflow: hidden; }
         #hp-fill { width: 100%; height: 100%; background: var(--hp-green); transition: width 0.4s ease; }
-        .image-window { width: 100%; flex-grow: 1; border: 4px solid #444; border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
-        #poke-img { height: 85%; filter: drop-shadow(0 0 15px white); z-index: 5; }
 
-        #core-area { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; width: 100%; }
-        .replay-btn { width: 55px; height: 55px; background: #00d4ff; border: 3px solid #fff; border-radius: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #008ba3; flex-shrink: 0; }
-        #core-fragment { min-width: 120px; height: 55px; background: #222; color: #ffd700; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid #fff; font-family: var(--game-font); flex-grow: 1; }
+        .image-window { width: 100%; flex: 1; border: 4px solid #444; border-radius: 20px; position: relative; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
+        #poke-img { height: 95%; filter: drop-shadow(0 0 10px white); z-index: 5; }
+
+        #gameplay-ui { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 6px; flex-shrink: 0; }
+        #core-cluster { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
+        #core-row { display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; }
+        .replay-btn { width: 45px; height: 45px; background: #00d4ff; border: 3px solid #fff; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #008ba3; }
+        #core-fragment { min-width: 100px; height: 45px; background: #222; color: #ffd700; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #fff; font-family: var(--game-font); padding: 0 15px; text-transform: uppercase; }
         
-        #checkpoints { display: flex; gap: 8px; flex-shrink: 0; }
-        .dot { width: 30px; height: 30px; background: #ccc; border-radius: 50%; border: 3px solid #888; display: flex; align-items: center; justify-content: center; font-size: 18px; color: transparent; font-weight: bold; }
+        #checkpoints { display: flex; gap: 8px; }
+        .dot { width: 24px; height: 24px; background: #ddd; border-radius: 50%; border: 2.5px solid #999; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; font-weight: bold; }
         .dot.active { background: var(--hp-green); border-color: #1b5e20; color: white; transform: scale(1.1); }
 
-        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 5px; width: 100%; box-sizing: border-box; }
-        .target { background: #fff; border: 2px solid #555; padding: 12px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #ccc; text-align: center; }
-        .matched { background: var(--hp-green) !important; color: white !important; pointer-events: none; border-color: #1b5e20 !important; }
+        #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; margin-top: 4px; }
+        .target { background: #fff; border: 2.5px solid #555; padding: 8px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; min-height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #ccc; text-transform: uppercase; }
+        .matched { background: var(--hp-green) !important; color: white !important; border-color: #1b5e20 !important; box-shadow: none !important; }
         .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; }
 
         #pokedex-view { position: fixed; inset: 0; padding-top: env(safe-area-inset-top, 20px); background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding-left: 20px; padding-right: 20px; color: white; }
         #pokedex-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; padding: 20px 0; }
-        .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; }
-        .dex-entry img { width: 65px; height: 65px; object-fit: contain; }
+        .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
+        .dex-entry img { width: 65px; height: 65px; }
         .dex-entry.locked img { filter: brightness(0) contrast(0.5); opacity: 0.8; }
-        
         #evo-scene { position: fixed; inset: 0; z-index: 8000; display: none; background: radial-gradient(circle, #fff, #3a8cff, #000); flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         #evo-scene.active { display: flex; animation: rotateBg 1s infinite linear; }
         #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 8500; }
-        
         @keyframes rotateSun { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         @keyframes rotateBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
@@ -83,7 +85,7 @@
     </div>
 </div>
 
-<div id="pokedex-trigger" onclick="openDex()"></div>
+<div id="pokedex-trigger" onclick="openDex()"><div id="poke-btn-white"></div></div>
 
 <div id="pokedex-view">
     <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;">
@@ -105,72 +107,60 @@
 
 <div id="game-view">
     <div id="pokemon-card">
+        <div class="header">
+            <div id="poke-name-badge">NAME</div>
+            <div class="hp-bar-outer"><div id="hp-fill"></div></div>
+        </div>
+
+        <div class="image-window"><div id="backdrop-container" style="position:absolute; inset:0;"></div><img id="poke-img" src=""></div>
+        
+        <div id="gameplay-ui">
+            <div id="core-cluster">
+                <div id="core-row">
+                    <button class="replay-btn" onclick="replaySound()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.25 2.5 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                    <div id="core-fragment">...</div>
+                </div>
+                <div id="checkpoints">
+                    <div class="dot" id="dot-0">✓</div><div class="dot" id="dot-1">✓</div><div class="dot" id="dot-2">✓</div>
+                </div>
+            </div>
+            <div id="word-grid"></div>
+        </div>
+
         <div id="finale-overlay" class="game-overlay" style="background: radial-gradient(circle, #2a0845, #000); color: gold;">
             <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src="">
             <div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0; font-family: var(--game-font);">MEGA EVOLVED!</div>
             <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
             <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKÉMON</button>
         </div>
-        <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;"><img id="ko-img" style="width: 140px; filter: grayscale(1);" src=""><p>Try again!</p><button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button></div>
-        
-        <div class="header">
-            <div id="poke-name-badge">NAME</div>
-            <div class="hp-bar"><div id="hp-fill"></div></div>
-        </div>
-        <div class="image-window"><div id="backdrop-container" style="position:absolute; inset:0;"></div><img id="poke-img" src=""></div>
-        <div id="gameplay-ui">
-            <div id="core-area">
-                <button class="replay-btn" onclick="replaySound()"><svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.25 2.5 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
-                <div id="core-fragment">...</div>
-                <div id="checkpoints"><div class="dot" id="dot-0">✓</div><div class="dot" id="dot-1">✓</div><div class="dot" id="dot-2">✓</div></div>
-            </div>
-            <div id="word-grid"></div>
-        </div>
+        <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;"><p>Try again!</p><button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button></div>
     </div>
 </div>
 
 <script>
     const uniqueCurriculum = [
-        { core: "SIGN", say: "sign", sets: [{ans:"DESIGN", mask:"DE ____", say:"deh-ZINE"}, {ans:"SIGNAL", mask:"____ AL", say:"SIG-nul"}, {ans:"ASSIGN", mask:"AS ____", say:"uh-SYNE"}] },
-        { core: "FORM", say: "form", sets: [{ans:"REFORM", mask:"RE ____", say:"ree-FORM"}, {ans:"UNIFORM", mask:"UNI ____", say:"YOU-nih-form"}, {ans:"FORMAT", mask:"____ AT", say:"FOR-mat"}] },
-        { core: "PORT", say: "port", sets: [{ans:"AIRPORT", mask:"AIR ____", say:"AIR-port"}, {ans:"IMPORT", mask:"IM ____", say:"IM-port"}, {ans:"REPORT", mask:"RE ____", say:"ree-PORT"}] },
-        { core: "TRACT", say: "trackt", sets: [{ans:"ATTRACT", mask:"AT ____", say:"uh-TRACKT"}, {ans:"TRACTOR", mask:"____ OR", say:"TRACK-ter"}, {ans:"EXTRACT", mask:"EX ____", say:"EX-trackt"}] },
-        { core: "JECT", say: "jekt", sets: [{ans:"REJECT", mask:"RE ____", say:"ree-JECT"}, {ans:"PROJECT", mask:"PRO ____", say:"PRO-ject"}, {ans:"EJECT", mask:"E ____", say:"ee-JECT"}] },
-        { core: "PHON", say: "fone", sets: [{ans:"PHONE", mask:"____ E", say:"fone"}, {ans:"PHONICS", mask:"____ ICS", say:"FON-iks"}, {ans:"SYMPHONY", mask:"SYM ____ Y", say:"SIM-fuh-nee"}] },
-        { core: "GRAPH", say: "graf", sets: [{ans:"GRAPHIC", mask:"____ IC", say:"Graf-ik"}, {ans:"GRAPHITE", mask:"____ ITE", say:"graf-yte"}, {ans:"AUTOGRAPH", mask:"AUTO ____", say:"AW-toe-graf"}] },
-        { core: "STRUCT", say: "struct", sets: [{ans:"STRUCTURE", mask:"____ URE", say:"STRUK-cher"}, {ans:"CONSTRUCT", mask:"CON ____", say:"kun-STRUKT"}, {ans:"DESTRUCT", mask:"DE ____", say:"dee-STRUKT"}] },
-        { core: "CYCL", say: "sy-kul", sets: [{ans:"BICYCLE", mask:"BI ____ E", say:"BY-sik-ul"}, {ans:"RECYCLE", mask:"RE ____ E", say:"ree-SY-kul"}, {ans:"CYCLONE", mask:"____ ONE", say:"SY-klone"}] },
-        { core: "THERM", say: "thurm", sets: [{ans:"THERMAL", mask:"____ AL", say:"THUR-mul"}, {ans:"THERMOS", mask:"____ OS", say:"THUR-moss"}, {ans:"ISOTHERM", mask:"ISO ____", say:"EYE-so-thurm"}] },
-        { core: "BIO", say: "by-oh", sets: [{ans:"BIOTIC", mask:"____ TIC", say:"by-OT-ik"}, {ans:"BIOME", mask:"____ ME", say:"BY-ohm"}, {ans:"BIOLOGY", mask:"____ LOGY", say:"by-OL-oh-gee"}] },
-        { core: "GEO", say: "gee-oh", sets: [{ans:"GEOLOGY", mask:"____ LOGY", say:"gee-OL-oh-gee"}, {ans:"GEODESIC", mask:"____ DESIC", say:"gee-oh-DES-ik"}, {ans:"GEOGRAPHY", mask:"____ GRAPHY", say:"gee-OG-rah-fee"}] },
-        { core: "AUTO", say: "aw-toe", sets: [{ans:"AUTOMATIC", mask:"____ MATIC", say:"aw-toe-MAT-ik"}, {ans:"AUTOPILOT", mask:"____ PILOT", say:"AW-toe-py-let"}, {ans:"AUTOGRAPH", mask:"____ GRAPH", say:"AW-toe-graf"}] },
-        { core: "TELE", say: "tel-ee", sets: [{ans:"TELEPHONE", mask:"____ PHONE", say:"TEL-uh-fone"}, {ans:"TELEGRAM", mask:"____ GRAM", say:"TEL-uh-gram"}, {ans:"TELESCOPE", mask:"____ SCOPE", say:"TEL-uh-skope"}] },
-        { core: "SCOPE", say: "skope", sets: [{ans:"MICROSCOPE", mask:"MICRO ____", say:"MY-kro-skope"}, {ans:"PERISCOPE", mask:"PERI ____", say:"PER-ih-skope"}, {ans:"HOROSCOPE", mask:"HORO ____", say:"HOR-oh-skope"}] },
-        { core: "SPECT", say: "spekt", sets: [{ans:"INSPECT", mask:"IN ____", say:"in-SPEKT"}, {ans:"RESPECT", mask:"RE ____", say:"ree-SPEKT"}, {ans:"SPECTACLE", mask:"____ ACLE", say:"SPEK-tah-kul"}] },
-        { core: "MULTI", say: "mul-tee", sets: [{ans:"MULTIVERSE", mask:"____ VERSE", say:"MUL-tee-vers"}, {ans:"MULTIPLY", mask:"____ PLY", say:"MUL-tih-ply"}, {ans:"MULTIPLE", mask:"____ PLE", say:"MUL-tih-pul"}] },
-        { core: "PRESS", say: "press", sets: [{ans:"EXPRESS", mask:"EX ____", say:"ex-PRESS"}, {ans:"IMPRESS", mask:"IM ____", say:"im-PRESS"}, {ans:"PRESSURE", mask:"____ URE", say:"PRESH-er"}] },
-        { core: "PLAY", say: "play", sets: [{ans:"PLAYGROUND", mask:"____ GROUND", say:"PLAY-grownd"}, {ans:"PLAYER", mask:"____ ER", say:"PLAY-er"}, {ans:"REPLAY", mask:"RE ____", say:"REE-play"}] },
-        { core: "LIGHT", say: "light", sets: [{ans:"SUNLIGHT", mask:"SUN ____", say:"SUN-light"}, {ans:"FLASHLIGHT", mask:"FLASH ____", say:"FLASH-light"}, {ans:"LIGHTNING", mask:"____ NING", say:"LIGHT-ning"}] },
-        { core: "POWER", say: "power", sets: [{ans:"POWERFUL", mask:"____ FUL", say:"POW-er-ful"}, {ans:"EMPOWER", mask:"EM ____", say:"em-POW-er"}, {ans:"POWERLESS", mask:"____ LESS", say:"POW-er-less"}] },
-        { core: "SCRIBE", say: "skrybe", sets: [{ans:"DESCRIBE", mask:"DE ____", say:"deh-SKRYBE"}, {ans:"INSCRIBE", mask:"IN ____", say:"in-SKRYBE"}, {ans:"SUBSCRIBE", mask:"SUB ____", say:"sub-SKRYBE"}] },
-        { core: "DICT", say: "dikt", sets: [{ans:"DICTATE", mask:"____ ATE", say:"DIK-tate"}, {ans:"PREDICT", mask:"PRE ____", say:"pre-DIKT"}, {ans:"DICTION", mask:"____ ION", say:"DIK-shun"}] },
-        { core: "VIS", say: "viz", sets: [{ans:"VISION", mask:"____ ION", say:"VIZH-un"}, {ans:"VISIBLE", mask:"____ IBLE", say:"VIZ-ih-bul"}, {ans:"VISUAL", mask:"____ UAL", say:"VIZ-yoo-ul"}] },
-        { core: "AUD", say: "awd", sets: [{ans:"AUDIO", mask:"____ IO", say:"AW-dee-oh"}, {ans:"AUDIENCE", mask:"____ IENCE", say:"AW-dee-ense"}, {ans:"AUDIBLE", mask:"____ IBLE", say:"AW-dih-bul"}] },
-        { core: "PHOTO", say: "fo-toe", sets: [{ans:"PHOTOGRAPH", mask:"____ GRAPH", say:"FO-toe-graf"}, {ans:"PHOTON", mask:"____ ON", say:"FO-ton"}, {ans:"PHOTOS", mask:"____ S", say:"FO-toze"}] },
-        { core: "METER", say: "mee-ter", sets: [{ans:"KILOMETER", mask:"KILO ____", say:"kil-OM-it-er"}, {ans:"THERMOMETER", mask:"THERMO ____", say:"thur-MOM-it-er"}, {ans:"PARKINGMETER", mask:"PARKING ____", say:"PARK-ing-mee-ter"}] },
-        { core: "LOGY", say: "loh-gee", sets: [{ans:"BIOLOGY", mask:"BIO ____", say:"by-OL-oh-gee"}, {ans:"ZOOLOGY", mask:"ZOO ____", say:"zoo-OL-oh-gee"}, {ans:"ECOLOGY", mask:"ECO ____", say:"ee-KOL-oh-gee"}] },
-        { core: "CHRON", say: "kron", sets: [{ans:"CHRONIC", mask:"____ IC", say:"KRON-ik"}, {ans:"CHRONOLOGY", mask:"____ OLOGY", say:"kruh-nol-oh-gee"}, {ans:"SYNCHRONIZE", mask:"SYN ____ IZE", say:"SIN-kroh-nyze"}] },
-        { core: "PATH", say: "path", sets: [{ans:"SYMPATHY", mask:"SYM ____ Y", say:"SIM-puh-thee"}, {ans:"EMPATHY", mask:"EM ____ Y", say:"EM-puh-thee"}, {ans:"PATHWAY", mask:"____ WAY", say:"PATH-way"}] },
-        { core: "CENT", say: "sent", sets: [{ans:"CENTURY", mask:"____ URY", say:"SEN-chu-ree"}, {ans:"PERCENT", mask:"PER ____", say:"per-SENT"}, {ans:"CENTIMETER", mask:"____ IMETER", say:"SEN-tih-mee-ter"}] },
-        { core: "REFORM", say: "ree-form", sets: [{ans:"REFORM", mask:"RE ____", say:"ree-FORM"}, {ans:"CONFORM", mask:"CON ____", say:"kun-FORM"}, {ans:"DEFORM", mask:"DE ____", say:"dee-FORM"}] },
-        { core: "SIGNAGE", say: "sign-idge", sets: [{ans:"SIGNAGE", mask:"____ AGE", say:"SIGN-idge"}, {ans:"ASSIGN", mask:"AS ____", say:"uh-SYNE"}, {ans:"SIGNIFY", mask:"____ IFY", say:"SIG-nih-fy"}] },
-        { core: "EXTRACT", say: "ex-trakt", sets: [{ans:"EXTRACT", mask:"EX ____", say:"EX-trackt"}, {ans:"CONTRACT", mask:"CON ____", say:"KON-trakt"}, {ans:"DETRACT", mask:"DE ____", say:"dee-TRAKT"}] },
-        { core: "DESTRUCT", say: "dee-strukt", sets: [{ans:"DESTRUCT", mask:"DE ____", say:"dee-STRUKT"}, {ans:"OBSTRUCT", mask:"OB ____", say:"ub-STRUKT"}, {ans:"INSTRUCT", mask:"IN ____", say:"in-STRUKT"}] },
-        { core: "DEPRESS", say: "dee-press", sets: [{ans:"DEPRESS", mask:"DE ____", say:"deh-PRESS"}, {ans:"REPRESS", mask:"RE ____", say:"ree-PRESS"}, {ans:"OPPRESS", mask:"OP ____", say:"uh-PRESS"}] },
-        { core: "VIEW", say: "view", sets: [{ans:"PREVIEW", mask:"PRE ____", say:"PREE-view"}, {ans:"REVIEW", mask:"RE ____", say:"ree-VIEW"}, {ans:"VIEWER", mask:"____ ER", say:"VIEW-er"}] },
-        { core: "ACT", say: "akt", sets: [{ans:"ACTION", mask:"____ ION", say:"AK-shun"}, {ans:"REACTIVE", mask:"RE ____ IVE", say:"ree-AK-tiv"}, {ans:"ACTOR", mask:"____ OR", say:"AK-ter"}] },
-        { core: "POSE", say: "poze", sets: [{ans:"COMPOSE", mask:"COM ____", say:"kum-POZE"}, {ans:"EXPOSE", mask:"EX ____", say:"ex-POZE"}, {ans:"OPPOSE", mask:"OP ____", say:"uh-POZE"}] },
-        { core: "TRACT", say: "trakt", sets: [{ans:"CONTRACT", mask:"CON ____", say:"KON-trakt"}, {ans:"ATTRACT", mask:"AT ____", say:"uh-TRAKT"}, {ans:"DISTRACT", mask:"DIS ____", say:"dis-TRAKT"}] }
+        { core: "SIGN", sets: [{ans:"DESIGN", mask:"DE ____", say:"Design"}, {ans:"SIGNAL", mask:"____ AL", say:"Signal"}, {ans:"ASSIGN", mask:"AS ____", say:"Assign"}] },
+        { core: "FORM", sets: [{ans:"REFORM", mask:"RE ____", say:"Reform"}, {ans:"UNIFORM", mask:"UNI ____", say:"Uniform"}, {ans:"FORMAT", mask:"____ AT", say:"Format"}] },
+        { core: "PORT", sets: [{ans:"AIRPORT", mask:"AIR ____", say:"Airport"}, {ans:"IMPORT", mask:"IM ____", say:"Import"}, {ans:"REPORT", mask:"RE ____", say:"Report"}] },
+        { core: "TRACT", sets: [{ans:"ATTRACT", mask:"AT ____", say:"Attract"}, {ans:"TRACTOR", mask:"____ OR", say:"Tractor"}, {ans:"EXTRACT", mask:"EX ____", say:"Extract"}] },
+        { core: "JECT", sets: [{ans:"REJECT", mask:"RE ____", say:"Reject"}, {ans:"PROJECT", mask:"PRO ____", say:"Project"}, {ans:"EJECT", mask:"E ____", say:"Eject"}] },
+        { core: "PHON", sets: [{ans:"PHONE", mask:"____ E", say:"Phone"}, {ans:"PHONICS", mask:"____ ICS", say:"Phonics"}, {ans:"SYMPHONY", mask:"SYM ____ Y", say:"Symphony"}] },
+        { core: "GRAPH", sets: [{ans:"GRAPHIC", mask:"____ IC", say:"Graphic"}, {ans:"GRAPHITE", mask:"____ ITE", say:"Graphite"}, {ans:"AUTOGRAPH", mask:"AUTO ____", say:"Autograph"}] },
+        { core: "STRUCT", sets: [{ans:"STRUCTURE", mask:"____ URE", say:"Structure"}, {ans:"CONSTRUCT", mask:"CON ____", say:"Construct"}, {ans:"DESTRUCT", mask:"DE ____", say:"Destruct"}] },
+        { core: "AUTO", sets: [{ans:"AUTO", mask:"____", say:"Auto"}, {ans:"PILOT", mask:"AUTO ____", say:"Autopilot"}, {ans:"GRAPH", mask:"AUTO ____", say:"Autograph"}] },
+        { core: "CYCL", sets: [{ans:"BICYCLE", mask:"BI ____ E", say:"Bicycle"}, {ans:"RECYCLE", mask:"RE ____ E", say:"Recycle"}, {ans:"CYCLONE", mask:"____ ONE", say:"Cyclone"}] },
+        { core: "THERM", sets: [{ans:"THERMAL", mask:"____ AL", say:"Thermal"}, {ans:"THERMOS", mask:"____ OS", say:"Thermos"}, {ans:"ISOTHERM", mask:"ISO ____", say:"Isotherm"}] },
+        { core: "BIO", sets: [{ans:"BIOTIC", mask:"____ TIC", say:"Biotic"}, {ans:"BIOME", mask:"____ ME", say:"Biome"}, {ans:"BIOLOGY", mask:"____ LOGY", say:"Biology"}] },
+        { core: "TELE", sets: [{ans:"TELEPHONE", mask:"____ PHONE", say:"Telephone"}, {ans:"TELEGRAM", mask:"____ GRAM", say:"Telegram"}, {ans:"TELESCOPE", mask:"____ SCOPE", say:"Telescope"}] },
+        { core: "VIEW", sets: [{ans:"PREVIEW", mask:"PRE ____", say:"Preview"}, {ans:"REVIEW", mask:"RE ____", say:"Review"}, {ans:"VIEWER", mask:"____ ER", say:"Viewer"}] },
+        { core: "ACT", sets: [{ans:"ACTION", mask:"____ ION", say:"Action"}, {ans:"ACTOR", mask:"____ OR", say:"Actor"}, {ans:"ACTIVE", mask:"____ IVE", say:"Active"}] },
+        { core: "MARK", sets: [{ans:"MARKER", mask:"____ ER", say:"Marker"}, {ans:"REMARK", mask:"RE ____", say:"Remark"}, {ans:"MARKET", mask:"____ ET", say:"Market"}] },
+        { core: "HELP", sets: [{ans:"HELPER", mask:"____ ER", say:"Helper"}, {ans:"HELPFUL", mask:"____ FUL", say:"Helpful"}, {ans:"HELPED", mask:"____ ED", say:"Helped"}] },
+        { core: "KIND", sets: [{ans:"KINDLY", mask:"____ LY", say:"Kindly"}, {ans:"KINDNESS", mask:"____ NESS", say:"Kindness"}, {ans:"UNKIND", mask:"UN ____", say:"Unkind"}] },
+        { core: "PART", sets: [{ans:"PARTNER", mask:"____ NER", say:"Partner"}, {ans:"APART", mask:"A ____", say:"Apart"}, {ans:"PARTY", mask:"____ Y", say:"Party"}] },
+        { core: "TEST", sets: [{ans:"TESTER", mask:"____ ER", say:"Tester"}, {ans:"TESTING", mask:"____ ING", say:"Testing"}, {ans:"RETEST", mask:"RE ____", say:"Retest"}] }
     ];
 
     const megaLibrary = [
@@ -194,10 +184,8 @@
 
     const trapPool = ["CAT", "DOG", "SUN", "RUN", "BIG", "RED", "FLY", "TOP", "HAT", "VAN", "BOX", "JAM", "SKY", "LOG", "MUD", "NET", "TEN"];
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let family, stageIdx = 0, hp = 100, currentSet, matchesThisRound = 0, isGameOver = false;
-    let usedRoots = [];
+    let family, stageIdx = 0, hp = 100, currentSet, matchesThisRound = 0, isGameOver = false, usedRoots = [];
     let unlocked = JSON.parse(localStorage.getItem('pmUnlocked_v12')) || [];
-
     const canvas = document.getElementById('fx-canvas'), ctx = canvas.getContext('2d');
     let particles = [];
     function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -205,7 +193,11 @@
 
     function animateFX() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((p, i) => { p.vy += (p.g || 0); p.x+=p.vx; p.y+=p.vy; p.l-=0.02; ctx.globalAlpha=p.l; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fill(); if(p.l<=0) particles.splice(i,1); });
+        if(isGameOver && Math.random() < 0.1) {
+            const x = Math.random()*canvas.width, y = Math.random()*canvas.height*0.5;
+            for(let i=0; i<40; i++) particles.push({x, y, vx:(Math.random()-0.5)*18, vy:(Math.random()-0.8)*18, c:`hsl(${Math.random()*360},100%,60%)`, l:1, g:0.25});
+        }
+        particles.forEach((p, i) => { p.vy += (p.g || 0); p.x+=p.vx; p.y+=p.vy; p.l-=0.015; ctx.globalAlpha=p.l; ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.fill(); if(p.l<=0) particles.splice(i,1); });
         requestAnimationFrame(animateFX);
     }
 
@@ -217,15 +209,23 @@
         if(type === 'evo_build') { for(let i=0; i<30; i++) { const t = audioCtx.currentTime + (i * 2.5 / 30); const osc = audioCtx.createOscillator(), gn = audioCtx.createGain(); osc.type='square'; osc.frequency.setValueAtTime(150 + (i * 60), t); gn.gain.setValueAtTime(0.06, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.1); osc.connect(gn); gn.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.1); } }
     }
 
-    function speak(txt) { return new Promise(r => { synth.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang='en-GB'; u.rate=0.85; u.onend=r; synth.speak(u); setTimeout(r, 2200); }); }
+    function speak(txt) { 
+        return new Promise(r => { 
+            synth.cancel(); 
+            const u = new SpeechSynthesisUtterance(txt.toLowerCase()); 
+            u.lang='en-GB'; u.rate=0.85; u.onend=r; synth.speak(u); setTimeout(r, 2000); 
+        }); 
+    }
+    
     function startGame() { document.getElementById('start-gate').style.display='none'; if(audioCtx.state==='suspended') audioCtx.resume(); resetGame(); }
-    function replaySound() { if(currentSet) speak(currentSet.say); }
+    function replaySound() { if(currentSet) speak(currentSet.core); }
 
-    function handleTap(el, isCorrect, full, say) {
+    function handleTap(el, isCorrect, say) {
         if(el.classList.contains('matched') || el.classList.contains('wrong')) return;
         if(isCorrect) {
             document.getElementById(`dot-${matchesThisRound}`).classList.add('active');
-            el.innerText = full; el.classList.add('matched'); playSfx('chime');
+            el.innerText = say.toUpperCase(); 
+            el.classList.add('matched'); playSfx('chime');
             matchesThisRound++;
             if(matchesThisRound === 3) {
                 if(!unlocked.includes(family.p[stageIdx].i)) { unlocked.push(family.p[stageIdx].i); localStorage.setItem('pmUnlocked_v12', JSON.stringify(unlocked)); }
@@ -233,7 +233,8 @@
             } else speak(say);
         } else { 
             el.classList.add('wrong'); hp -= 33.4; playSfx('miss'); 
-            const fill = document.getElementById('hp-fill'); fill.style.width = Math.max(0, hp) + "%";
+            const fill = document.getElementById('hp-fill');
+            fill.style.width = Math.max(0, hp) + "%";
             fill.style.background = hp > 66 ? "var(--hp-green)" : hp > 33 ? "var(--hp-yellow)" : "var(--hp-red)";
             if(hp <= 1) { document.getElementById('ko-img').src = document.getElementById('poke-img').src; document.getElementById('defeat-overlay').style.display='flex'; }
             setTimeout(()=>el.classList.remove('wrong'), 500);
@@ -252,14 +253,16 @@
         if(available.length === 0) { usedRoots = []; available = uniqueCurriculum; }
         currentSet = available[Math.floor(Math.random()*available.length)];
         usedRoots.push(currentSet.core);
-
         document.getElementById('core-fragment').innerText = currentSet.core;
+        
         const grid = document.getElementById('word-grid'); grid.innerHTML = '';
-        let items = currentSet.sets || currentSet.items;
-        let opts = items.slice(0,3).map(i => ({text: i.mask, ok:true, f:i.ans, s:i.say}));
+        let opts = currentSet.sets.map(i => ({text: i.mask.toUpperCase(), ok:true, s:i.say}));
         [...trapPool].sort(()=>Math.random()-0.5).slice(0,5).forEach(t => opts.push({text: "____ "+t, ok:false}));
-        opts.sort(()=>Math.random()-0.5).forEach(o => { const d = document.createElement('div'); d.className='target'; d.innerText=o.text; d.onclick = () => handleTap(d, o.ok, o.f, o.s); grid.appendChild(d); });
-        await speak(currentSet.say);
+        opts.sort(()=>Math.random()-0.5).forEach(o => { 
+            const d = document.createElement('div'); d.className='target'; d.innerText=o.text; 
+            d.onclick = () => handleTap(d, o.ok, o.s || o.text.replace('____','').trim()); grid.appendChild(d); 
+        });
+        await speak(currentSet.core);
     }
 
     async function runEvolution() {
@@ -268,16 +271,16 @@
             isGameOver = true; 
             document.getElementById('mega-img-final').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.mega.i}.png`;
             const row = document.getElementById('parade-row'); row.innerHTML = "";
-            family.p.forEach(p => { row.innerHTML += `<img style="width:50px" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png">`; });
+            family.p.forEach(p => { row.innerHTML += `<img style="width:40px" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png">`; });
             document.getElementById('finale-overlay').style.display = 'flex'; 
-            speak("Incredible! You are a true Mega Master!");
+            speak("Incredible! Mega Evolved!");
             return; 
         }
         const oldN = family.p[stageIdx].n; stageIdx++;
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
         evoImg.src = document.getElementById('poke-img').src; scene.classList.add('active'); playSfx('evo_build');
         await speak(`${oldN} is evolving!`);
-        for(let i=0; i<40; i++) particles.push({x:canvas.width/2, y:canvas.height/2, vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15, c:'#fff', l:1});
+        for(let i=0; i<50; i++) particles.push({x:canvas.width/2, y:canvas.height/2, vx:(Math.random()-0.5)*15, vy:(Math.random()-0.5)*15, c:'#fff', l:1});
         evoImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${family.p[stageIdx].i}.png`;
         document.getElementById('evo-text').innerText = family.p[stageIdx].n.toUpperCase() + "!";
         await speak(`${oldN} evolved into ${family.p[stageIdx].n}!`);
@@ -293,7 +296,7 @@
         document.getElementById('pokedex-view').style.display = 'flex';
     }
     function closeDex() { document.getElementById('pokedex-view').style.display = 'none'; }
-    function resetCollection() { if(confirm("Are you sure? This will reset your whole collection!")) { unlocked = []; localStorage.removeItem('pmUnlocked_v12'); closeDex(); document.getElementById('start-gate').style.display='flex'; } }
+    function resetCollection() { if(confirm("Reset?")) { unlocked = []; localStorage.removeItem('pmUnlocked_v12'); closeDex(); document.getElementById('start-gate').style.display='flex'; } }
     function resetGame() { isGameOver = false; stageIdx = 0; usedRoots = []; document.getElementById('finale-overlay').style.display = 'none'; document.getElementById('defeat-overlay').style.display = 'none'; family = megaLibrary[Math.floor(Math.random()*megaLibrary.length)]; initStage(); }
     animateFX();
 </script>

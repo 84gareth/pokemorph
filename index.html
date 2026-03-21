@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PokéMorph v11.8</title>
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png">
+    
+    <title>PokéMorph v11.9</title>
     <style>
         :root { 
             --card-gold: #ffd700;
@@ -49,7 +52,6 @@
         .matched { background: var(--hp-green) !important; color: white !important; pointer-events: none; border-color: #1b5e20 !important; box-shadow: none !important; }
         .wrong { background: var(--hp-red) !important; color: white !important; animation: shake 0.4s; }
 
-        /* POKEDEX LAYOUT RESTORED */
         #pokedex-view { position: fixed; inset: 0; padding-top: env(safe-area-inset-top, 20px); background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding-left: 20px; padding-right: 20px; color: white; box-sizing: border-box; }
         #pokedex-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; padding: 20px 0; -webkit-overflow-scrolling: touch; }
         .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -104,7 +106,7 @@
 
         <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;">
             <img id="ko-img" style="width: 140px; filter: grayscale(1);" src="">
-            <p>Don't give up! Try again!</p>
+            <p>Try again!</p>
             <button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button>
         </div>
 
@@ -241,7 +243,7 @@
             el.classList.add('wrong'); hp -= 33.4; playSfx('miss'); 
             const fill = document.getElementById('hp-fill'); fill.style.width = Math.max(0, hp) + "%";
             fill.style.background = hp > 66 ? "var(--hp-green)" : hp > 33 ? "var(--hp-yellow)" : "var(--hp-red)";
-            if(hp <= 1) { document.getElementById('defeat-overlay').style.display='flex'; }
+            if(hp <= 1) { document.getElementById('ko-img').src = document.getElementById('poke-img').src; document.getElementById('defeat-overlay').style.display='flex'; }
             setTimeout(()=>el.classList.remove('wrong'), 500);
         }
     }

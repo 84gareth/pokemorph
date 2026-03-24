@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PokeMorph v17.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <title>PokeMorph v17.6</title>
     <style>
         :root { 
             --card-gold: #ffd700; --hp-green: #4caf50; --hp-yellow: #ffcc00; --hp-red: #ff4422; 
@@ -44,24 +44,19 @@
 
         #core-fragment { min-width: 100px; height: 45px; background: #222; color: #ffd700; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid #fff; font-family: var(--game-font); padding: 0 15px; text-transform: uppercase; }
         #checkpoints { display: flex; gap: 8px; margin: 4px 0; }
-        .dot { width: 24px; height: 24px; background: #ddd; border-radius: 50%; border: 2.5px solid #999; }
-        .dot.active { background: var(--hp-green); border-color: #1b5e20; transform: scale(1.1); }
+        .dot { width: 26px; height: 26px; background: #ddd; border-radius: 50%; border: 2.5px solid #999; display: flex; align-items: center; justify-content: center; color: transparent; font-weight: bold; font-size: 16px; }
+        .dot.active { background: var(--hp-green); border-color: #1b5e20; color: white; transform: scale(1.1); }
 
         #word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
-        .target { background: #fff; border: 2.5px solid #555; padding: 10px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; min-height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #ccc; text-transform: uppercase; transition: all 0.2s; }
-        .matched { background: var(--hp-green) !important; color: white !important; border-color: #1b5e20 !important; pointer-events: none; }
-        .wrong { background: var(--hp-red) !important; color: white !important; border-color: #8b1a0a !important; pointer-events: none; }
+        .target { background: #fff; border: 2.5px solid #555; padding: 10px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; min-height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #ccc; text-transform: uppercase; }
+        .matched { background: var(--hp-green) !important; color: white !important; border-color: #1b5e20 !important; pointer-events: none; box-shadow: none !important; }
+        .wrong { background: var(--hp-red) !important; color: white !important; border-color: #8b1a0a !important; pointer-events: none; box-shadow: none !important; }
 
         #pokedex-view { position: fixed; inset: 0; padding-top: env(safe-area-inset-top, 20px); background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding-left: 20px; padding-right: 20px; color: white; box-sizing: border-box; }
         #pokedex-list { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 10px; padding: 20px 0; }
         .dex-entry { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 5px; text-align: center; }
         .dex-entry img { width: 45px; height: 45px; }
         .dex-entry.locked img { filter: brightness(0); opacity: 0.5; }
-
-        #confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; }
-        .modal-box { background: white; border: 8px solid var(--pokedex-red); border-radius: 30px; padding: 30px; width: 85%; max-width: 400px; text-align: center; color: #333; }
-        .modal-btns { display: flex; gap: 20px; justify-content: center; margin-top: 25px; }
-        .modal-btn { padding: 15px 30px; border-radius: 15px; font-family: var(--game-font); font-size: 20px; border: none; color: white; flex: 1; cursor: pointer; }
 
         #evo-scene { position: fixed; inset: 0; z-index: 8000; display: none; background: radial-gradient(circle, #fff, #3a8cff, #000); flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         #evo-scene.active { display: flex; animation: rotateBg 1s infinite linear; }
@@ -85,14 +80,10 @@
 
 <div id="pokedex-trigger" onclick="openDex()"><div id="poke-btn-white"></div></div>
 
-<div id="confirm-modal">
-    <div class="modal-box"><h3>Reset Data?</h3><div class="modal-btns"><button class="modal-btn" style="background:var(--hp-green)" onclick="confirmReset(true)">YES</button><button class="modal-btn" style="background:var(--hp-red)" onclick="confirmReset(false)">NO</button></div></div>
-</div>
-
 <div id="pokedex-view">
-    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px; flex-shrink: 0;"><h2 id="dex-title" style="margin:0; font-family: var(--game-font);">POKEDEX</h2><div onclick="closeDex()" style="font-size:30px; cursor:pointer">X</div></div>
+    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;"><h2 id="dex-title" style="margin:0; font-family: var(--game-font);">POKEDEX</h2><div onclick="closeDex()" style="font-size:30px; cursor:pointer">X</div></div>
     <div id="pokedex-list"></div>
-    <div style="padding:10px; border-top:2px solid white; display:flex; justify-content:center; padding-bottom: env(safe-area-inset-bottom, 15px); flex-shrink: 0;"><div style="width: 60px; height: 60px; background: #ff4422; border: 4px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="showResetModal()"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div></div>
+    <div style="padding:10px; border-top:2px solid white; display:flex; justify-content:center; padding-bottom: env(safe-area-inset-bottom, 15px);"><div style="width: 60px; height: 60px; background: #ff4422; border: 4px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="localStorage.clear(); location.reload();"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div></div>
 </div>
 
 <div id="evo-scene">
@@ -114,20 +105,77 @@
                     </button>
                     <div id="core-fragment">...</div>
                 </div>
-                <div id="checkpoints"><div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div><div class="dot" id="dot-2"></div></div>
+                <div id="checkpoints"><div class="dot" id="dot-0">✓</div><div class="dot" id="dot-1">✓</div><div class="dot" id="dot-2">✓</div></div>
             </div>
             <div id="word-grid"></div>
         </div>
+        
         <div id="finale-overlay" class="game-overlay" style="background: radial-gradient(circle, #2a0845, #000); color: gold;">
-            <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src=""><div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0; font-family: var(--game-font);">MEGA Master!</div>
-            <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div><button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKEMON</button>
+            <img id="mega-img-final" style="width:180px; filter: drop-shadow(0 0 30px #00d4ff);" src="">
+            <div style="background: gold; color: black; padding: 5px 20px; border-radius: 10px; font-weight: 900; margin: 15px 0; font-family: var(--game-font);">MEGA Master!</div>
+            <div id="parade-row" style="display:flex; gap:10px; margin-bottom: 20px;"></div>
+            <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">NEXT POKEMON</button>
         </div>
-        <div id="defeat-overlay" class="game-overlay" style="background: #222; color: white;"><p>Try again!</p><button class="target" style="background: var(--hp-green); color: white; padding: 15px 30px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button></div>
+
+        <div id="defeat-overlay" class="game-overlay" style="background: #111; color: white;">
+            <img id="defeat-img" style="width:140px; filter: grayscale(1) opacity(0.7);" src="">
+            <div style="font-family: var(--game-font); font-size: 28px; color: var(--hp-red); margin: 15px 0;">Knocked Out!</div>
+            <div style="margin-bottom: 20px; font-size: 18px;">Don't give up! Let's try again!</div>
+            <button class="target" style="background: var(--hp-green); color: white; border: 4px solid #fff; padding: 15px 40px; border-radius: 20px;" onclick="resetGame()">TRY AGAIN</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // THE 142 UNIQUE CURRICULUM
+    const megaLibrary = [
+        { id:'char', t:'fire', p:[{n:'Charmander',i:4},{n:'Charmeleon',i:5},{n:'Charizard',i:6}], megas:[{n:'Mega Charizard X', i:10034}, {n:'Mega Charizard Y', i:10035}] },
+        { id:'mew', t:'grass', p:[{n:'Mewtwo',i:150}], megas:[{n:'Mega Mewtwo X', i:10043}, {n:'Mega Mewtwo Y', i:10044}] },
+        { id:'blast', t:'water', p:[{n:'Squirtle',i:7},{n:'Wartortle',i:8},{n:'Blastoise',i:9}], mega:{n:'Mega Blastoise', i:10036} },
+        { id:'venus', t:'grass', p:[{n:'Bulbasaur',i:1},{n:'Ivysaur',i:2},{n:'Venusaur',i:3}], mega:{n:'Mega Venusaur', i:10033} },
+        { id:'alak', t:'grass', p:[{n:'Abra',i:63},{n:'Kadabra',i:64},{n:'Alakazam',i:65}], mega:{n:'Mega Alakazam', i:10037} },
+        { id:'geng', t:'fire', p:[{n:'Gastly',i:92},{n:'Haunter',i:93},{n:'Gengar',i:94}], mega:{n:'Mega Gengar', i:10038} },
+        { id:'luc', t:'fire', p:[{n:'Riolu',i:447},{n:'Lucario',i:448}], mega:{n:'Mega Lucario', i:10059} },
+        { id:'amph', t:'fire', p:[{n:'Mareep',i:179},{n:'Flaaffy',i:180},{n:'Ampharos',i:181}], mega:{n:'Mega Ampharos', i:10045} },
+        { id:'aero', t:'fire', p:[{n:'Aerodactyl',i:142}], mega:{n:'Mega Aerodactyl', i:10042} },
+        { id:'steel', t:'fire', p:[{n:'Onix',i:95},{n:'Steelix',i:208}], mega:{n:'Mega Steelix', i:10072} },
+        { id:'sciz', t:'grass', p:[{n:'Scyther',i:123},{n:'Scizor',i:212}], mega:{n:'Mega Scizor', i:10046} },
+        { id:'blaz', t:'fire', p:[{n:'Torchic',i:255},{n:'Combusken',i:256},{n:'Blaziken',i:257}], mega:{n:'Mega Blaziken', i:10050} },
+        { id:'scept', t:'grass', p:[{n:'Treecko',i:252},{n:'Grovyle',i:253},{n:'Sceptile',i:254}], mega:{n:'Mega Sceptile', i:10065} },
+        { id:'swamp', t:'water', p:[{n:'Mudkip',i:258},{n:'Marshtomp',i:259},{n:'Swampert',i:260}], mega:{n:'Mega Swampert', i:10064} },
+        { id:'gard', t:'grass', p:[{n:'Ralts',i:280},{n:'Kirlia',i:281},{n:'Gardevoir',i:282}], mega:{n:'Mega Gardevoir', i:10051} },
+        { id:'gall', t:'fire', p:[{n:'Ralts',i:280},{n:'Kirlia',i:281},{n:'Gallade',i:475}], mega:{n:'Mega Gallade', i:10068} },
+        { id:'aggr', t:'fire', p:[{n:'Aron',i:304},{n:'Lairon',i:305},{n:'Aggron',i:306}], mega:{n:'Mega Aggron', i:10053} },
+        { id:'medi', t:'fire', p:[{n:'Meditite',i:307},{n:'Medicham',i:308}], mega:{n:'Mega Medicham', i:10054} },
+        { id:'manec', t:'fire', p:[{n:'Electrike',i:309},{n:'Manectric',i:310}], mega:{n:'Mega Manectric', i:10055} },
+        { id:'banet', t:'fire', p:[{n:'Shuppet',i:353},{n:'Banette',i:354}], mega:{n:'Mega Banette', i:10056} },
+        { id:'abs', t:'fire', p:[{n:'Absol',i:359}], mega:{n:'Mega Absol', i:10057} },
+        { id:'garch', t:'fire', p:[{n:'Gible',i:443},{n:'Gabite',i:444},{n:'Garchomp',i:445}], mega:{n:'Mega Garchomp', i:10058} },
+        { id:'abom', t:'grass', p:[{n:'Snover',i:459},{n:'Abomasnow',i:460}], mega:{n:'Mega Abomasnow', i:10060} },
+        { id:'beed', t:'grass', p:[{n:'Weedle',i:13},{n:'Kakuna',i:14},{n:'Beedrill',i:15}], mega:{n:'Mega Beedrill', i:10090} },
+        { id:'slowb', t:'water', p:[{n:'Slowpoke',i:79},{n:'Slowbro',i:80}], mega:{n:'Mega Slowbro', i:10071} },
+        { id:'sable', t:'fire', p:[{n:'Sableye',i:302}], mega:{n:'Mega Sableye', i:10066} },
+        { id:'sharp', t:'water', p:[{n:'Carvanha',i:318},{n:'Sharpedo',i:319}], mega:{n:'Mega Sharpedo', i:10070} },
+        { id:'cam', t:'fire', p:[{n:'Numel',i:322},{n:'Camerupt',i:323}], mega:{n:'Mega Camerupt', i:10087} },
+        { id:'altar', t:'grass', p:[{n:'Swablu',i:333},{n:'Altaria',i:334}], mega:{n:'Mega Altaria', i:10067} },
+        { id:'glal', t:'water', p:[{n:'Snorunt',i:361},{n:'Glalie',i:362}], mega:{n:'Mega Glalie', i:10074} },
+        { id:'salam', t:'fire', p:[{n:'Bagon',i:371},{n:'Shelgon',i:372},{n:'Salamence',i:373}], mega:{n:'Mega Salamence', i:10089} },
+        { id:'metag', t:'fire', p:[{n:'Beldum',i:374},{n:'Metang',i:375},{n:'Metagross',i:376}], mega:{n:'Mega Metagross', i:10076} },
+        { id:'tyran', t:'grass', p:[{n:'Larvitar',i:246},{n:'Pupitar',i:247},{n:'Tyranitar',i:248}], mega:{n:'Mega Tyranitar', i:10049} },
+        { id:'kang', t:'fire', p:[{n:'Kangaskhan',i:115}], mega:{n:'Mega Kangaskhan', i:10039} },
+        { id:'pins', t:'grass', p:[{n:'Pinsir',i:127}], mega:{n:'Mega Pinsir', i:10040} },
+        { id:'herac', t:'grass', p:[{n:'Heracross',i:214}], mega:{n:'Mega Heracross', i:10047} },
+        { id:'hound', t:'fire', p:[{n:'Houndour',i:228},{n:'Houndoom',i:229}], mega:{n:'Mega Houndoom', i:10048} },
+        { id:'maw', t:'fire', p:[{n:'Mawile',i:303}], mega:{n:'Mega Mawile', i:10052} },
+        { id:'ray', t:'grass', p:[{n:'Rayquaza',i:384}], mega:{n:'Mega Rayquaza', i:10079} },
+        { id:'kyog', t:'water', p:[{n:'Kyogre',i:382}], mega:{n:'Primal Kyogre', i:10077} },
+        { id:'groud', t:'fire', p:[{n:'Groudon',i:383}], mega:{n:'Primal Groudon', i:10078} },
+        { id:'latias', t:'fire', p:[{n:'Latias',i:380}], mega:{n:'Mega Latias', i:10062} },
+        { id:'latios', t:'fire', p:[{n:'Latios',i:381}], mega:{n:'Mega Latios', i:10063} },
+        { id:'lopun', t:'fire', p:[{n:'Buneary',i:427},{n:'Lopunny',i:428}], mega:{n:'Mega Lopunny', i:10088} },
+        { id:'audin', t:'fire', p:[{n:'Audino',i:531}], mega:{n:'Mega Audino', i:10069} },
+        { id:'dian', t:'fire', p:[{n:'Diancie',i:719}], mega:{n:'Mega Diancie', i:10075} }
+    ];
+
     const curriculum = [
         { core: "HAPPY", sets: ["HAPPILY", "HAPPIER", "UNHAPPY"] },
         { core: "MOVE", sets: ["REMOVE", "MOVEMENT", "MOVER"] },
@@ -147,7 +195,7 @@
         { core: "SLOW", sets: ["SLOWLY", "SLOWNESS", "SLOWEST"] },
         { core: "HEART", sets: ["HEARTLESS", "HEARTY", "HEARTBEAT"] },
         { core: "PORT", sets: ["REPORT", "IMPORT", "AIRPORT"] },
-        { core: "SIGHT", sets: ["INSIGHT", "SIGHTING", "OVERSIGHT"] },
+        { core: "SIGHT", sets: ["INSIGHT", "SIGHTED", "SIGHTING"] },
         { core: "SOUND", sets: ["SOUNDLY", "UNSOUND", "SOUNDBAR"] },
         { core: "HAND", sets: ["HANDFUL", "HANDLE", "HANDY"] },
         { core: "MARK", sets: ["REMARK", "MARKET", "MARKER"] },
@@ -270,55 +318,6 @@
         { core: "THINK", sets: ["THINKER", "THOUGHT", "RETHINK"] }
     ];
 
-    const megaLibrary = [
-        { id:'char', t:'fire', p:[{n:'Charmander',i:4},{n:'Charmeleon',i:5},{n:'Charizard',i:6}], megas:[{n:'Mega Charizard X', i:10034}, {n:'Mega Charizard Y', i:10035}] },
-        { id:'mew', t:'grass', p:[{n:'Mewtwo',i:150}], megas:[{n:'Mega Mewtwo X', i:10043}, {n:'Mega Mewtwo Y', i:10044}] },
-        { id:'blast', t:'water', p:[{n:'Squirtle',i:7},{n:'Wartortle',i:8},{n:'Blastoise',i:9}], mega:{n:'Mega Blastoise', i:10036} },
-        { id:'venus', t:'grass', p:[{n:'Bulbasaur',i:1},{n:'Ivysaur',i:2},{n:'Venusaur',i:3}], mega:{n:'Mega Venusaur', i:10033} },
-        { id:'alak', t:'grass', p:[{n:'Abra',i:63},{n:'Kadabra',i:64},{n:'Alakazam',i:65}], mega:{n:'Mega Alakazam', i:10037} },
-        { id:'geng', t:'fire', p:[{n:'Gastly',i:92},{n:'Haunter',i:93},{n:'Gengar',i:94}], mega:{n:'Mega Gengar', i:10038} },
-        { id:'luc', t:'fire', p:[{n:'Riolu',i:447},{n:'Lucario',i:448}], mega:{n:'Mega Lucario', i:10059} },
-        { id:'amph', t:'fire', p:[{n:'Mareep',i:179},{n:'Flaaffy',i:180},{n:'Ampharos',i:181}], mega:{n:'Mega Ampharos', i:10045} },
-        { id:'aero', t:'fire', p:[{n:'Aerodactyl',i:142}], mega:{n:'Mega Aerodactyl', i:10042} },
-        { id:'steel', t:'fire', p:[{n:'Onix',i:95},{n:'Steelix',i:208}], mega:{n:'Mega Steelix', i:10072} },
-        { id:'sciz', t:'grass', p:[{n:'Scyther',i:123},{n:'Scizor',i:212}], mega:{n:'Mega Scizor', i:10046} },
-        { id:'blaz', t:'fire', p:[{n:'Torchic',i:255},{n:'Combusken',i:256},{n:'Blaziken',i:257}], mega:{n:'Mega Blaziken', i:10050} },
-        { id:'scept', t:'grass', p:[{n:'Treecko',i:252},{n:'Grovyle',i:253},{n:'Sceptile',i:254}], mega:{n:'Mega Sceptile', i:10065} },
-        { id:'swamp', t:'water', p:[{n:'Mudkip',i:258},{n:'Marshtomp',i:259},{n:'Swampert',i:260}], mega:{n:'Mega Swampert', i:10064} },
-        { id:'gard', t:'grass', p:[{n:'Ralts',i:280},{n:'Kirlia',i:281},{n:'Gardevoir',i:282}], mega:{n:'Mega Gardevoir', i:10051} },
-        { id:'gall', t:'fire', p:[{n:'Ralts',i:280},{n:'Kirlia',i:281},{n:'Gallade',i:475}], mega:{n:'Mega Gallade', i:10068} },
-        { id:'aggr', t:'fire', p:[{n:'Aron',i:304},{n:'Lairon',i:305},{n:'Aggron',i:306}], mega:{n:'Mega Aggron', i:10053} },
-        { id:'medi', t:'fire', p:[{n:'Meditite',i:307},{n:'Medicham',i:308}], mega:{n:'Mega Medicham', i:10054} },
-        { id:'manec', t:'fire', p:[{n:'Electrike',i:309},{n:'Manectric',i:310}], mega:{n:'Mega Manectric', i:10055} },
-        { id:'banet', t:'fire', p:[{n:'Shuppet',i:353},{n:'Banette',i:354}], mega:{n:'Mega Banette', i:10056} },
-        { id:'abs', t:'fire', p:[{n:'Absol',i:359}], mega:{n:'Mega Absol', i:10057} },
-        { id:'garch', t:'fire', p:[{n:'Gible',i:443},{n:'Gabite',i:444},{n:'Garchomp',i:445}], mega:{n:'Mega Garchomp', i:10058} },
-        { id:'abom', t:'grass', p:[{n:'Snover',i:459},{n:'Abomasnow',i:460}], mega:{n:'Mega Abomasnow', i:10060} },
-        { id:'beed', t:'grass', p:[{n:'Weedle',i:13},{n:'Kakuna',i:14},{n:'Beedrill',i:15}], mega:{n:'Mega Beedrill', i:10090} },
-        { id:'slowb', t:'water', p:[{n:'Slowpoke',i:79},{n:'Slowbro',i:80}], mega:{n:'Mega Slowbro', i:10071} },
-        { id:'sable', t:'fire', p:[{n:'Sableye',i:302}], mega:{n:'Mega Sableye', i:10066} },
-        { id:'sharp', t:'water', p:[{n:'Carvanha',i:318},{n:'Sharpedo',i:319}], mega:{n:'Mega Sharpedo', i:10070} },
-        { id:'cam', t:'fire', p:[{n:'Numel',i:322},{n:'Camerupt',i:323}], mega:{n:'Mega Camerupt', i:10087} },
-        { id:'altar', t:'grass', p:[{n:'Swablu',i:333},{n:'Altaria',i:334}], mega:{n:'Mega Altaria', i:10067} },
-        { id:'glal', t:'water', p:[{n:'Snorunt',i:361},{n:'Glalie',i:362}], mega:{n:'Mega Glalie', i:10074} },
-        { id:'salam', t:'fire', p:[{n:'Bagon',i:371},{n:'Shelgon',i:372},{n:'Salamence',i:373}], mega:{n:'Mega Salamence', i:10089} },
-        { id:'metag', t:'fire', p:[{n:'Beldum',i:374},{n:'Metang',i:375},{n:'Metagross',i:376}], mega:{n:'Mega Metagross', i:10076} },
-        { id:'tyran', t:'grass', p:[{n:'Larvitar',i:246},{n:'Pupitar',i:247},{n:'Tyranitar',i:248}], mega:{n:'Mega Tyranitar', i:10049} },
-        { id:'kang', t:'fire', p:[{n:'Kangaskhan',i:115}], mega:{n:'Mega Kangaskhan', i:10039} },
-        { id:'pins', t:'grass', p:[{n:'Pinsir',i:127}], mega:{n:'Mega Pinsir', i:10040} },
-        { id:'herac', t:'grass', p:[{n:'Heracross',i:214}], mega:{n:'Mega Heracross', i:10047} },
-        { id:'hound', t:'fire', p:[{n:'Houndour',i:228},{n:'Houndoom',i:229}], mega:{n:'Mega Houndoom', i:10048} },
-        { id:'maw', t:'fire', p:[{n:'Mawile',i:303}], mega:{n:'Mega Mawile', i:10052} },
-        { id:'ray', t:'grass', p:[{n:'Rayquaza',i:384}], mega:{n:'Mega Rayquaza', i:10079} },
-        { id:'kyog', t:'water', p:[{n:'Kyogre',i:382}], mega:{n:'Primal Kyogre', i:10077} },
-        { id:'groud', t:'fire', p:[{n:'Groudon',i:383}], mega:{n:'Primal Groudon', i:10078} },
-        { id:'latias', t:'fire', p:[{n:'Latias',i:380}], mega:{n:'Mega Latias', i:10062} },
-        { id:'latios', t:'fire', p:[{n:'Latios',i:381}], mega:{n:'Mega Latios', i:10063} },
-        { id:'lopun', t:'fire', p:[{n:'Buneary',i:427},{n:'Lopunny',i:428}], mega:{n:'Mega Lopunny', i:10088} },
-        { id:'audin', t:'fire', p:[{n:'Audino',i:531}], mega:{n:'Mega Audino', i:10069} },
-        { id:'dian', t:'fire', p:[{n:'Diancie',i:719}], mega:{n:'Mega Diancie', i:10075} }
-    ];
-
     const backdropSVGs = { fire: `<svg viewBox="0 0 200 100" preserveAspectRatio="none" style="width:100%;height:100%"><rect width="200" height="100" fill="#a82e2e"/><path d="M0 100 L40 30 L80 100 L140 10 L200 100 Z" fill="#6b1d1d"/></svg>`, water: `<svg viewBox="0 0 200 100" preserveAspectRatio="none" style="width:100%;height:100%"><rect width="200" height="100" fill="#87CEEB"/><path d="M0 80 Q50 60 100 80 T200 80 L200 100 L0 100 Z" fill="#4169E1"/></svg>`, grass: `<svg viewBox="0 0 200 100" preserveAspectRatio="none" style="width:100%;height:100%"><rect width="200" height="100" fill="#a8e063"/><circle cx="50" cy="85" rx="60" ry="20" fill="#56ab2f"/></svg>` };
     const trapPool = ["CAT", "DOG", "SUN", "RUN", "BIG", "RED", "FLY", "TOP", "HAT", "VAN", "BOX", "JAM", "SKY", "LOG", "NET", "TEN"];
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -355,7 +354,9 @@
     function handleTap(el, isCorrect, say) {
         if(el.classList.contains('matched') || el.classList.contains('wrong')) return;
         if(isCorrect) {
-            document.getElementById(`dot-${matchesThisRound}`).classList.add('active'); el.innerText = say.toUpperCase(); el.classList.add('matched'); playSfx('chime'); matchesThisRound++;
+            const dot = document.getElementById(`dot-${matchesThisRound}`);
+            dot.classList.add('active'); 
+            el.innerText = say.toUpperCase(); el.classList.add('matched'); playSfx('chime'); matchesThisRound++;
             if(matchesThisRound === 3) {
                 const pk = (stageIdx < family.p.length) ? family.p[stageIdx] : currentMega;
                 if(!unlocked.includes(pk.i)) { unlocked.push(pk.i); localStorage.setItem('pm_unlocked_v16', JSON.stringify(unlocked)); }
@@ -365,14 +366,22 @@
             el.classList.add('wrong'); hp -= 33.4; playSfx('miss'); 
             const fill = document.getElementById('hp-fill'); fill.style.width = Math.max(0, hp) + "%";
             if(hp > 50) fill.style.background = 'var(--hp-green)'; else if(hp > 20) fill.style.background = 'var(--hp-yellow)'; else fill.style.background = 'var(--hp-red)';
-            if(hp <= 1) { setTimeout(()=>document.getElementById('defeat-overlay').style.display='flex', 500); }
+            if(hp <= 1) { 
+                document.getElementById('defeat-img').src = document.getElementById('poke-img').src;
+                setTimeout(() => {
+                    document.getElementById('defeat-overlay').style.display='flex';
+                    speak("Don't give up! Let's try again!");
+                }, 500); 
+            }
         }
     }
 
     async function initStage() {
         matchesThisRound = 0; const p = (stageIdx < family.p.length) ? family.p[stageIdx] : currentMega;
         document.getElementById('backdrop-container').innerHTML = backdropSVGs[family.t] || backdropSVGs.fire;
-        document.getElementById('hp-fill').style.width = hp + "%"; document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+        document.getElementById('hp-fill').style.width = hp + "%"; 
+        document.getElementById('hp-fill').style.background = hp > 50 ? 'var(--hp-green)' : (hp > 20 ? 'var(--hp-yellow)' : 'var(--hp-red)');
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
         document.getElementById('poke-name-badge').innerText = p.n;
         document.getElementById('poke-img').src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.i}.png`;
         let avail = curriculum.filter(c => !usedRoots.includes(c.core));
@@ -382,7 +391,6 @@
         const grid = document.getElementById('word-grid'); grid.innerHTML = '';
         let opts = [];
         
-        // NUCLEAR REDACTION V4
         const coreVal = currentSet.core.toUpperCase();
         const corePrefix = coreVal.substring(0, coreVal.length - 1); 
         
@@ -406,6 +414,7 @@
     async function runEvolution() {
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
         const oldN = (stageIdx < family.p.length) ? family.p[stageIdx].n : currentMega.n;
+        hp = 100; // HEAL ON EVOLUTION
         if(stageIdx >= family.p.length - 1) { 
             const nextN = currentMega.n; evoImg.src = document.getElementById('poke-img').src; 
             document.getElementById('evo-text').innerText = oldN.toUpperCase() + "..."; scene.classList.add('active'); playSfx('evo_build');
@@ -442,8 +451,6 @@
         document.getElementById('dex-title').innerText = `FOUND: ${count}/${total}`; document.getElementById('pokedex-view').style.display = 'flex';
     }
     function closeDex() { document.getElementById('pokedex-view').style.display = 'none'; }
-    function showResetModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
-    function confirmReset(yes) { if(yes) { unlocked = []; localStorage.clear(); closeDex(); location.reload(); } document.getElementById('confirm-modal').style.display = 'none'; }
     function resetGame() { 
         isGameOver = false; stageIdx = 0; usedRoots = []; hp = 100;
         document.getElementById('finale-overlay').style.display = 'none'; document.getElementById('defeat-overlay').style.display = 'none'; 

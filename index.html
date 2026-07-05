@@ -27,10 +27,11 @@
         /* ---------- START SCREEN ---------- */
         #start-gate { position: fixed; inset: 0; background: #3d7dca; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         #sunburst { position: absolute; width: 250%; height: 250%; background: repeating-conic-gradient(from 0deg, #3d7dca 0deg 20deg, #4b8fe0 20deg 40deg); animation: rotateSun 24s linear infinite; opacity: 0.7; }
-        .float-ball { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 3px solid #222; background: linear-gradient(#ff3b3b 48%, #222 48%, #222 55%, #fff 55%); animation: floatBall 6s ease-in-out infinite; opacity: .85; }
-        .float-ball::after { content:''; position:absolute; width: 12px; height: 12px; background:#fff; border: 3px solid #222; border-radius:50%; top:50%; left:50%; transform: translate(-50%,-50%); }
+        img.float-ball { position: absolute; width: 48px; height: 48px; image-rendering: pixelated; filter: drop-shadow(0 4px 4px rgba(0,0,0,.35)); animation: floatBall 6s ease-in-out infinite; opacity: .95; }
         .logo-container { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 40px; }
-        .logo-text { font-family: var(--game-font); font-size: clamp(50px, 18vw, 120px); color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); filter: drop-shadow(0 8px 0 var(--poke-blue)); margin: 0; letter-spacing: 2px; animation: logoBounce 2.4s ease-in-out infinite; }
+        .logo-text { font-family: var(--game-font); font-size: clamp(38px, 12.5vw, 96px); color: var(--poke-yellow); -webkit-text-stroke: 2px var(--poke-blue); filter: drop-shadow(0 7px 0 var(--poke-blue)); margin: 0; letter-spacing: 1px; max-width: 100vw; padding: 0 8px; text-align: center; animation: logoBounce 2.4s ease-in-out infinite; }
+        .eacc { position: relative; display: inline-block; }
+        .eacc::before { content: ''; position: absolute; left: 56%; top: -0.12em; width: .36em; height: .13em; border-radius: .08em; background: var(--poke-yellow); box-shadow: 0 0 0 2px var(--poke-blue), 0 .06em 0 var(--poke-blue); transform: translateX(-50%) rotate(-16deg); }
         .play-icon-btn { width: 130px; height: 130px; background: var(--poke-blue); border: 8px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: pulsePlay 1.5s infinite; }
         .play-triangle { width: 0; height: 0; border-top: 25px solid transparent; border-bottom: 25px solid transparent; border-left: 40px solid white; margin-left: 15px; }
 
@@ -42,7 +43,7 @@
         #pokedex-trigger { background: white; overflow: hidden; }
         #pokedex-trigger::before { content: ''; width: 100%; height: 5px; background: #333; position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1; }
         #pokedex-trigger::after { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 3px solid #333; }
-        #poke-btn-white { width: 12px; height: 12px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
+        #poke-btn-white { width: 10px; height: 10px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
 
         /* ---------- CARD ---------- */
         #game-view { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: calc(env(safe-area-inset-top, 20px) + 4px) 10px env(safe-area-inset-bottom, 10px); box-sizing: border-box; }
@@ -98,7 +99,10 @@
         .detail-card img { width: 78%; max-height: 34vh; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); }
         #detail-x { position: absolute; top: 8px; right: 14px; font-size: 26px; cursor: pointer; color: #666; line-height: 1; }
         #detail-name { font-family: var(--game-font); font-size: 22px; margin-top: 6px; }
-        #detail-type { display: inline-block; margin-top: 8px; padding: 5px 16px 2px; border-radius: 12px; color: #fff; font-family: var(--game-font); font-size: 13px; letter-spacing: 1px; }
+        #detail-type { display: flex; gap: 6px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+        .type-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px 2px; border-radius: 12px; color: #fff; font-family: var(--game-font); font-size: 12px; letter-spacing: 1px; }
+        .type-pill svg { margin-top: -2px; }
+        #detail-desc { margin-top: 9px; font-weight: 700; font-size: 14.5px; line-height: 1.35; color: #555; font-family: var(--body-font); }
         #m-toast { position: fixed; top: 16%; left: 50%; transform: translateX(-50%) scale(0); z-index: 9650; background: linear-gradient(#333, #111); color: var(--poke-yellow); font-family: var(--game-font); font-size: 20px; padding: 12px 24px 8px; border-radius: 18px; border: 3px solid #fff; box-shadow: 0 8px 20px rgba(0,0,0,.4); pointer-events: none; white-space: nowrap; }
         #m-toast.show { animation: mToastPop 1.5s ease forwards; }
         @keyframes mToastPop { 0% { transform: translateX(-50%) scale(0); } 12% { transform: translateX(-50%) scale(1.08); } 20%, 80% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(0); opacity: 0; } }
@@ -159,12 +163,12 @@
 
 <div id="start-gate">
     <div id="sunburst"></div>
-    <div class="float-ball" style="top:12%; left:10%;"></div>
-    <div class="float-ball" style="top:70%; left:80%; animation-delay:-2s;"></div>
-    <div class="float-ball" style="top:78%; left:14%; animation-delay:-4s; width:34px; height:34px;"></div>
+    <img class="float-ball" style="top:12%; left:10%;" alt="">
+    <img class="float-ball" style="top:70%; left:80%; animation-delay:-2s;" alt="">
+    <img class="float-ball" style="top:78%; left:14%; animation-delay:-4s;" alt="">
     <div id="ver" style="position:absolute; bottom: calc(env(safe-area-inset-bottom, 8px) + 8px); right: 14px; z-index: 6; font-weight: 800; font-size: 12px; color: rgba(255,255,255,.65); font-family: var(--body-font);"></div>
     <div class="logo-container">
-        <h1 class="logo-text">PokéMorph</h1>
+        <h1 class="logo-text">Pok<span class="eacc">e</span>Morph</h1>
         <div class="play-icon-btn" onclick="startGame()"><div class="play-triangle"></div></div>
     </div>
 </div>
@@ -181,6 +185,7 @@
         <img id="detail-img" alt="">
         <div id="detail-name"></div>
         <div id="detail-type"></div>
+        <div id="detail-desc"></div>
     </div>
 </div>
 <div id="pokedex-view">
@@ -405,7 +410,7 @@
         electric:{c1:'#ffe14d',c2:'#f9a825'}, psychic:{c1:'#f48fb1',c2:'#8e24aa'}, ghost:{c1:'#b39ddb',c2:'#4527a0'},
         fighting:{c1:'#ffab73',c2:'#bf360c'}, steel:{c1:'#cfd8dc',c2:'#546e7a'}, rock:{c1:'#d7ccc8',c2:'#5d4037'},
         dragon:{c1:'#9fa8da',c2:'#283593'}, ice:{c1:'#b3f0ff',c2:'#0097a7'}, dark:{c1:'#90a4ae',c2:'#212121'},
-        bug:{c1:'#dce775',c2:'#558b2f'}, normal:{c1:'#ffe0b2',c2:'#a1887f'}, fairy:{c1:'#ffc1e3',c2:'#d81b60'},
+        bug:{c1:'#dce775',c2:'#558b2f'}, normal:{c1:'#ffe0b2',c2:'#a1887f'}, fairy:{c1:'#ffc1e3',c2:'#d81b60'}, bug:{c1:'#dce775',c2:'#558b2f'}, ground:{c1:'#ffcc80',c2:'#8d6e63'}, poison:{c1:'#ce93d8',c2:'#6a1b9a'}, flying:{c1:'#c3d4ff',c2:'#5a7bd8'},
         ground:{c1:'#ffcc80',c2:'#8d6e63'}
     };
     const B = (inner) => `<svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">${inner}</svg>`;
@@ -444,6 +449,298 @@
     }
     function saveMStats() { localStorage.setItem('pm_stats_v1', JSON.stringify(mStats)); }
     function showMToast(txt) { const t = document.getElementById('m-toast'); t.innerText = txt; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); }
+    const DEXTYPE_KEY = { g:'grass', f:'fire', w:'water', b:'bug', n:'normal', p:'poison', e:'electric', G:'ground', y:'fairy', F:'fighting', P:'psychic', r:'rock', h:'ghost', i:'ice', d:'dragon', k:'dark', s:'steel', l:'flying' };
+    const TYPE_GLYPHS = {
+    fire: '<path d="M10 3.2c1.6 2.6 3.9 3.7 3.9 7a3.9 3.9 0 0 1-7.8 0c0-1.8 1.3-2.5 2-4 .7.8 1.1 1.5 1.1 2.5.8-1.5.8-3.4.8-5.5Z"/>',
+    water: '<path d="M10 3.2c2.7 3.6 4.6 5.4 4.6 8.1a4.6 4.6 0 0 1-9.2 0c0-2.7 1.9-4.5 4.6-8.1Z"/>',
+    grass: '<path d="M15.3 4.7c-6.6 0-9.8 3.4-10.3 10.3 6.9-.5 10.3-3.7 10.3-10.3Z"/>',
+    electric: '<path d="M11.4 2.8 5.8 11h3.1l-1 6.2 6.3-8.4h-3.5l.7-6Z"/>',
+    psychic: '<ellipse cx="10" cy="10" rx="6.2" ry="4.1"/><circle cx="10" cy="10" r="2" class="hole"/>',
+    ghost: '<path d="M10 3.6a5 5 0 0 1 5 5v6.6l-2-1.5-1.5 1.5-1.5-1.5-1.5 1.5L7 14.2l-2 1.5V8.6a5 5 0 0 1 5-5Z"/>',
+    dragon: '<path d="M10 2.8 16.6 10 10 17.2 3.4 10Z"/><path d="M10 6.4 13.2 10 10 13.6 6.8 10Z" class="hole"/>',
+    fighting: '<path d="M10 2.4 11.7 7.6 17 8.4l-3.8 3.6.9 5.3L10 14.8l-4.1 2.5.9-5.3L3 8.4l5.3-.8Z"/>',
+    ice: '<g class="strokes"><line x1="10" y1="3.4" x2="10" y2="16.6"/><line x1="4.3" y1="6.7" x2="15.7" y2="13.3"/><line x1="15.7" y1="6.7" x2="4.3" y2="13.3"/></g>',
+    normal: '<circle cx="10" cy="10" r="5" class="ring"/>',
+    dark: '<path d="M14 10a5.6 5.6 0 1 1-5.4-5.6A4.4 4.4 0 0 0 14 10Z"/>',
+    rock: '<path d="M6 5.8 12 4.3l4.2 3.7-1 6-6.7 1.6L4.3 11Z"/>',
+    steel: '<path d="M10 2.9 16 6.4v7.2L10 17.1 4 13.6V6.4Z"/><circle cx="10" cy="10" r="2.2" class="hole"/>',
+    fairy: '<path d="M10 2.6 11.7 8.3 17.4 10 11.7 11.7 10 17.4 8.3 11.7 2.6 10 8.3 8.3Z"/>',
+    flying: '<path d="M16.4 5.4C11 4.4 5.8 6.6 3.6 13.2c5.5.6 10.7-1.9 12.8-7.8Z"/>',
+    poison: '<circle cx="8" cy="8.4" r="3.4"/><circle cx="13.2" cy="11" r="2.5"/><circle cx="8.8" cy="14" r="1.8"/>',
+    ground: '<path d="M2.8 15.4 8 6.6l3 5 2.6-3.6 3.6 7.4Z"/>',
+    bug: '<circle cx="10" cy="11.6" r="4.4"/><g class="strokes thin"><path d="M8 8.2C7 6.4 6 5.4 4.6 4.8" fill="none"/><path d="M12 8.2c1-1.8 2-2.8 3.4-3.4" fill="none"/></g>'
+};
+function typeIcon(type, size = 12) {
+    const th = typeThemes[type] || typeThemes.normal;
+    const glyph = TYPE_GLYPHS[type] || TYPE_GLYPHS.normal;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" style="vertical-align:-1px"><circle cx="10" cy="10" r="10" fill="${th.c2}"/><g fill="#fff" style="stroke:none">${glyph.replace(/class="hole"/g, `fill="${th.c2}"`).replace(/class="ring"/g, `fill="none" stroke="#fff" stroke-width="2.6"`).replace(/class="strokes thin"/g, `stroke="#fff" stroke-width="1.6" fill="none"`).replace(/class="strokes"/g, `stroke="#fff" stroke-width="2.1" fill="none"`)}</g></svg>`;
+}
+    const DEXINFO = {
+    1:["gp","Bulbasaur grows a plant bulb on its back!"],
+    3:["gp","Venusaur's giant flower smells amazing in the sun!"],
+    4:["f","Charmander's tail flame shows how it feels!"],
+    6:["fl","Charizard breathes fire hot enough to melt rocks!"],
+    7:["w","Squirtle squirts water from its little mouth!"],
+    9:["w","Blastoise blasts water from cannons on its shell!"],
+    12:["bl","Butterfree loves sipping honey from flowers!"],
+    25:["e","Pikachu stores crackling electricity in its red cheeks!"],
+    26:["e","Raichu's tail works like a lightning rod!"],
+    34:["pG","Nidoking swings its mighty tail like a hammer!"],
+    35:["y","Clefairy loves to dance under the full moon!"],
+    37:["f","Vulpix is born with one fluffy white tail!"],
+    38:["f","Ninetales' nine tails are said to be magical!"],
+    39:["ny","Jigglypuff sings songs that make everyone sleepy!"],
+    43:["gp","Oddish buries itself in soil to sleep!"],
+    50:["G","Diglett pops out of the ground to say hello!"],
+    52:["n","Meowth adores anything shiny, especially coins!"],
+    54:["w","Psyduck gets headaches that give it strange powers!"],
+    58:["f","Growlithe is a brave and loyal puppy Pokémon!"],
+    59:["f","Arcanine runs so fast it seems to fly!"],
+    63:["P","Abra sleeps eighteen hours a day and teleports away!"],
+    65:["P","Alakazam's brain is smarter than a supercomputer!"],
+    68:["F","Machamp throws a thousand punches with four arms!"],
+    74:["rG","Geodude looks just like a rock with arms!"],
+    79:["wP","Slowpoke is very relaxed and a little forgetful!"],
+    94:["hp","Gengar loves to hide in shadows and play tricks!"],
+    95:["rG","Onix is a giant snake made of boulders!"],
+    103:["gP","Exeggutor has three happy heads on a tall trunk!"],
+    104:["G","Cubone always wears its little bone helmet!"],
+    106:["F","Hitmonlee's stretchy legs kick like springs!"],
+    107:["F","Hitmonchan punches faster than the eye can see!"],
+    110:["p","Weezing floats around and puffs out smelly gas!"],
+    122:["Py","Mr. Mime builds invisible walls with its hands!"],
+    123:["bl","Scyther slices the air with blade-like arms!"],
+    129:["w","Magikarp just splashes about, but keep training it!"],
+    130:["wl","Gyarados is a mighty sea dragon with a temper!"],
+    131:["wi","Lapras kindly ferries people across the sea!"],
+    132:["n","Ditto can transform into any Pokémon it sees!"],
+    133:["n","Eevee can evolve in lots of amazing ways!"],
+    134:["w","Vaporeon can melt into water and vanish!"],
+    135:["e","Jolteon's spiky fur shoots tiny lightning bolts!"],
+    136:["f","Flareon has a fiery flame sac inside its body!"],
+    143:["n","Snorlax eats a mountain of food then sleeps all day!"],
+    144:["il","Articuno's icy wings make it snow!"],
+    145:["el","Zapdos causes huge thunderstorms when it flies!"],
+    146:["fl","Moltres' flaming wings light up the night sky!"],
+    147:["d","Dratini sheds its skin as it grows and grows!"],
+    149:["dl","Dragonite flies around the world in sixteen hours!"],
+    150:["P","Mewtwo is the strongest psychic Pokémon ever made!"],
+    151:["P","Mew is playful, rare, and can learn any move!"],
+    152:["g","Chikorita waves its sweet-smelling leaf around!"],
+    155:["f","Cyndaquil's back bursts into flames when surprised!"],
+    157:["f","Typhlosion makes a shimmering heat haze around itself!"],
+    158:["w","Totodile loves to chomp on anything it sees!"],
+    160:["w","Feraligatr has huge jaws that snap like a trap!"],
+    175:["y","Togepi's shell is full of happiness to share!"],
+    181:["e","Ampharos' bright tail can be seen from space!"],
+    196:["P","Espeon predicts the weather with its fine fur!"],
+    197:["k","Umbreon's golden rings glow in the moonlight!"],
+    202:["P","Wobbuffet bounces attacks right back at foes!"],
+    208:["sG","Steelix digs deep underground with its steel body!"],
+    212:["bs","Scizor's pincers are as hard as steel!"],
+    214:["bF","Heracross can toss things a hundred times its weight!"],
+    229:["kf","Houndoom's howl sends shivers down your spine!"],
+    243:["e","Raikou races across the land like thunder!"],
+    244:["f","Entei is said to be born from a volcano!"],
+    245:["w","Suicune makes dirty water sparkling clean!"],
+    248:["rk","Tyranitar can knock down mountains!"],
+    249:["Pl","Lugia sleeps deep beneath the stormy sea!"],
+    250:["fl","Ho-Oh's rainbow feathers bring happiness!"],
+    251:["Pg","Celebi travels through time to protect forests!"],
+    252:["g","Treecko climbs walls with its sticky feet!"],
+    254:["g","Sceptile slices through trees with leaf blades!"],
+    255:["f","Torchic is a warm and cuddly fire chick!"],
+    257:["fF","Blaziken's kicks burn with blazing flames!"],
+    258:["w","Mudkip senses everything with its head fin!"],
+    260:["wG","Swampert can drag heavy boulders through mud!"],
+    282:["Py","Gardevoir protects its trainer with all its heart!"],
+    306:["sr","Aggron guards its mountain and fixes it after storms!"],
+    330:["Gd","Flygon whips up sandstorms with its wings!"],
+    350:["w","Milotic is called the most beautiful Pokémon!"],
+    359:["k","Absol appears to warn people of danger!"],
+    373:["dl","Salamence finally grew the wings it dreamed of!"],
+    376:["sP","Metagross has four brains working together!"],
+    380:["dP","Latias can turn invisible with its shiny feathers!"],
+    381:["dP","Latios flies faster than a jet plane!"],
+    382:["w","Kyogre can make the oceans grow bigger!"],
+    383:["G","Groudon can raise whole new lands from the sea!"],
+    384:["dl","Rayquaza lives way up high in the ozone layer!"],
+    385:["sP","Jirachi wakes once every thousand years to grant wishes!"],
+    386:["P","Deoxys came from space inside a meteor!"],
+    387:["g","Turtwig's shell is made of living soil!"],
+    389:["gG","Torterra carries a whole garden on its back!"],
+    390:["f","Chimchar's flame goes out when it sleeps!"],
+    392:["fF","Infernape fights with fists, feet and fire!"],
+    393:["w","Piplup is a proud little penguin!"],
+    395:["ws","Empoleon's crown wings can slice through ice!"],
+    405:["e","Luxray can see right through walls!"],
+    445:["dG","Garchomp flies as fast as a fighter jet!"],
+    448:["Fs","Lucario can sense the feelings of others!"],
+    468:["yl","Togekiss brings gifts to kind-hearted people!"],
+    470:["g","Leafeon cleans the air just like a plant!"],
+    471:["i","Glaceon can freeze its fur into sharp icicles!"],
+    483:["sd","Dialga has the power to control time!"],
+    484:["wd","Palkia can bend space itself!"],
+    487:["hd","Giratina lives in a strange mirror world!"],
+    491:["k","Darkrai brings dreams, some of them spooky!"],
+    493:["n","Arceus is said to have shaped the whole world!"],
+    494:["Pf","Victini shares endless energy and brings victory!"],
+    495:["g","Snivy soaks up sunshine to move faster!"],
+    497:["g","Serperior only uses full power against the strong!"],
+    501:["w","Oshawott fights with the shell on its tummy!"],
+    571:["k","Zoroark creates illusions to protect its friends!"],
+    635:["kd","Hydreigon has three fierce heads!"],
+    643:["df","Reshiram's tail burns like a jet engine!"],
+    644:["de","Zekrom's tail crackles with electricity!"],
+    653:["f","Fennekin snacks on twigs to fuel its fire!"],
+    658:["wk","Greninja throws stars made of water!"],
+    681:["sh","Aegislash is a ghostly sword and shield!"],
+    700:["y","Sylveon calms fights with its ribbon feelers!"],
+    716:["y","Xerneas' antlers glow with the colours of life!"],
+    717:["kl","Yveltal's wings glow red like a huge letter Y!"],
+    722:["gl","Rowlet turns its head almost all the way round!"],
+    724:["gh","Decidueye fires arrows made of leaves!"],
+    725:["f","Litten's fur is full of fiery oil!"],
+    727:["fk","Incineroar wears a belt of flames!"],
+    744:["r","Rockruff greets friends by rubbing its rocky collar!"],
+    745:["r","Lycanroc's rocky mane is razor sharp!"],
+    778:["hy","Mimikyu wears a costume to make friends!"],
+    791:["Ps","Solgaleo shines like the sun itself!"],
+    792:["Ph","Lunala looks like a beautiful crescent moon!"],
+    810:["g","Grookey drums on things with its special stick!"],
+    813:["f","Scorbunny warms up by running everywhere!"],
+    815:["f","Cinderace kicks blazing footballs at foes!"],
+    823:["ls","Corviknight is the strongest flyer in the skies!"],
+    831:["n","Wooloo rolls everywhere instead of walking!"],
+    887:["dh","Dragapult launches its little friends like rockets!"],
+    888:["y","Zacian slices through anything with grace!"],
+    889:["F","Zamazenta's shield can block any attack!"],
+    906:["g","Sprigatito kneads with its paws to make sweet smells!"],
+    908:["gk","Meowscarada dazzles foes with flower magic tricks!"],
+    909:["f","Fuecoco lies on warm rocks to soak up heat!"],
+    911:["fh","Skeledirge sings with a little fiery bird!"],
+    912:["w","Quaxly keeps its feathers neat and tidy!"],
+    914:["wF","Quaquaval dances powerful, dazzling dances!"],
+    915:["n","Lechonk sniffs out the tastiest food around!"],
+    959:["ys","Tinkaton built its huge hammer all by itself!"],
+    1000:["sh","Gholdengo is made of a thousand golden coins!"],
+    1007:["Fd","Koraidon is an ancient legend that loves to run!"],
+    1008:["ed","Miraidon is a legend from the far future!"],
+    64:["P","Kadabra's spoon makes its powers even stronger!"],
+    92:["hp","Gastly is a ball of spooky gas!"],
+    93:["hp","Haunter's lick can make you shiver!"],
+    447:["F","Riolu's heart is full of courage!"],
+    179:["e","Mareep's fluffy wool stores static electricity!"],
+    180:["e","Flaaffy's tail lights up when it's charged!"],
+    142:["rl","Aerodactyl is a fossil Pokémon from ancient times!"],
+    256:["fF","Combusken kicks ten times a second!"],
+    253:["g","Grovyle leaps from branch to branch at top speed!"],
+    259:["wG","Marshtomp moves fast through squishy mud!"],
+    280:["Py","Ralts can feel the feelings of people nearby!"],
+    281:["Py","Kirlia dances when it is happy!"],
+    475:["PF","Gallade fights fairly with blade-like elbows!"],
+    304:["sr","Aron munches on iron to grow its armour!"],
+    305:["sr","Lairon fights by bashing with its steel body!"],
+    307:["FP","Meditite never skips its daily training!"],
+    308:["FP","Medicham gained powers through years of meditation!"],
+    309:["e","Electrike stores static in its fur!"],
+    310:["e","Manectric creates thunderclouds above its head!"],
+    353:["h","Shuppet is drawn to grumpy feelings!"],
+    354:["h","Banette was once a toy that came to life!"],
+    443:["dG","Gible naps in small caves it digs!"],
+    444:["dG","Gabite loves collecting sparkly gems!"],
+    459:["gi","Snover grows tasty icicles around its tummy!"],
+    460:["gi","Abomasnow whips up sudden snowstorms!"],
+    13:["bp","Weedle has a sharp stinger on its head!"],
+    14:["bp","Kakuna stays perfectly still while it grows!"],
+    15:["bp","Beedrill guards its nest with three stingers!"],
+    80:["wP","Slowbro got a Shellder stuck on its tail!"],
+    302:["kh","Sableye's gem eyes sparkle in the dark!"],
+    318:["wk","Carvanha swims in packs with sharp teeth!"],
+    319:["wk","Sharpedo is called the bully of the sea!"],
+    322:["fG","Numel is slow but stores magma inside!"],
+    323:["fG","Camerupt has volcanoes on its back!"],
+    333:["nl","Swablu has soft, cloud-like cotton wings!"],
+    334:["dl","Altaria hums with a beautiful soprano voice!"],
+    361:["i","Snorunt lives happily in snowy caves!"],
+    362:["i","Glalie freezes foes with a chilly stare!"],
+    371:["d","Bagon dreams of flying and headbutts everything!"],
+    372:["d","Shelgon waits inside its shell to evolve!"],
+    374:["sP","Beldum talks to friends using magnetic pulses!"],
+    375:["sP","Metang formed when two Beldum joined together!"],
+    246:["rG","Larvitar eats a whole mountain of soil to grow!"],
+    247:["rG","Pupitar spins like a rocket inside its shell!"],
+    115:["n","Kangaskhan keeps its baby safe in its pouch!"],
+    127:["b","Pinsir grips things tight with its huge horns!"],
+    228:["kf","Houndour hunts in clever, chatty packs!"],
+    303:["sy","Mawile's big jaws are actually horns!"],
+    427:["n","Buneary can smash rocks with its rolled-up ears!"],
+    428:["n","Lopunny is quick, graceful and very tidy!"],
+    531:["n","Audino can hear a tiny heartbeat with its ears!"],
+    719:["ry","Diancie can make diamonds out of thin air!"],
+    16:["nl","Pidgey is gentle and loves long grass!"],
+    17:["nl","Pidgeotto patrols its big home territory!"],
+    18:["nl","Pidgeot flies at almost the speed of sound!"],
+    10033:["gp",""],
+    10034:["fd",""],
+    10035:["fl",""],
+    10036:["w",""],
+    10090:["bp",""],
+    10073:["nl",""],
+    10037:["P",""],
+    10071:["wP",""],
+    10038:["hp",""],
+    10039:["n",""],
+    10040:["bl",""],
+    10041:["wk",""],
+    10042:["rl",""],
+    10043:["PF",""],
+    10044:["P",""],
+    10045:["ed",""],
+    10072:["sG",""],
+    10046:["bs",""],
+    10047:["bF",""],
+    10048:["kf",""],
+    10049:["rk",""],
+    10065:["gd",""],
+    10050:["fF",""],
+    10064:["wG",""],
+    10051:["Py",""],
+    10066:["kh",""],
+    10052:["sy",""],
+    10053:["s",""],
+    10054:["FP",""],
+    10055:["e",""],
+    10070:["wk",""],
+    10087:["fG",""],
+    10067:["dy",""],
+    10056:["h",""],
+    10057:["k",""],
+    10074:["i",""],
+    10089:["dl",""],
+    10076:["sP",""],
+    10062:["dP",""],
+    10063:["dP",""],
+    10079:["dl",""],
+    10088:["nF",""],
+    10058:["dG",""],
+    10059:["Fs",""],
+    10060:["gi",""],
+    10068:["PF",""],
+    10069:["ny",""],
+    10075:["ry",""],
+    10077:["w",""],
+    10078:["Gf",""]
+};
+
+    const BALL_SPRITES = ['poke-ball','great-ball','ultra-ball','master-ball','premier-ball','luxury-ball','quick-ball','dusk-ball','heal-ball','net-ball','dive-ball','timer-ball','repeat-ball','nest-ball','dream-ball','beast-ball','love-ball','moon-ball','fast-ball','friend-ball'];
+    function randomizeBalls() {
+        const pool = [...BALL_SPRITES].sort(() => Math.random() - .5);
+        document.querySelectorAll('img.float-ball').forEach((img, i) => {
+            img.onerror = () => { img.style.display = 'none'; };
+            img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${pool[i % pool.length]}.png`;
+        });
+    }
     const monIndex = [];
     megaLibrary.forEach(f => { const pks = [...f.p, ...(f.megas || [f.mega])]; pks.forEach(pk => monIndex.push({ id: pk.i, name: pk.n, type: f.t })); });
     let rebirthLevel = parseInt(localStorage.getItem('pm_rebirth') || '0', 10); // 0,1,2
@@ -763,16 +1060,29 @@
         document.getElementById('stats-view').style.display = 'flex';
     }
     function closeStats() { document.getElementById('stats-view').style.display = 'none'; }
+    function typePills(chars, fallbackType) {
+        const types = chars ? chars.split('').map(c => DEXTYPE_KEY[c]).filter(Boolean) : [fallbackType];
+        return types.map(ty => { const th = typeThemes[ty] || typeThemes.normal; return `<span class="type-pill" style="background:${th.c2}">${typeIcon(ty, 14)} ${ty.toUpperCase()}</span>`; }).join('');
+    }
     function dexEntryTap(mon) {
         if (!unlocked.includes(mon.id)) { showMToast('Not found yet!'); return; }
-        const th = typeThemes[mon.type] || typeThemes.normal;
+        const info = DEXINFO[mon.id];
+        const types = (info ? info[0].split('').map(c => DEXTYPE_KEY[c]) : [mon.type]).filter(Boolean);
+        const th = typeThemes[types[0]] || typeThemes.normal;
         const img = document.getElementById('detail-img');
         safeImg(img, SPRITE_SM(mon.id)); img.src = SPRITE(mon.id);
         document.getElementById('detail-name').innerText = mon.name;
-        const t = document.getElementById('detail-type');
-        t.innerText = mon.type.toUpperCase(); t.style.background = th.c2;
+        document.getElementById('detail-type').innerHTML = typePills(info ? info[0] : null, mon.type);
+        let sentence = info && info[1];
+        if (!sentence) {
+            if (/^Mega /i.test(mon.name)) sentence = `${mon.name} is bursting with incredible Mega power!`;
+            else if (/^Primal /i.test(mon.name)) sentence = `${mon.name} has awesome power from ancient times!`;
+            else sentence = `${mon.name} is an amazing Pokémon!`;
+        }
+        document.getElementById('detail-desc').innerText = sentence;
         document.querySelector('.detail-card').style.borderColor = th.c2;
         document.getElementById('detail-modal').style.display = 'flex';
+        speak(`${mon.name}. ${sentence}`);
     }
     function closeDetail() { document.getElementById('detail-modal').style.display = 'none'; }
     function askReset() {
@@ -833,7 +1143,8 @@
         currentMega = family.megas ? family.megas[Math.floor(Math.random() * family.megas.length)] : family.mega;
         initStage();
     }
-    const GAME_VERSION = 19; // bump on each release
+    randomizeBalls();
+    const GAME_VERSION = 20; // bump on each release
     document.getElementById('ver').innerText = 'v' + GAME_VERSION;
     function setAppH() { document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px'); }
     window.addEventListener('resize', setAppH);

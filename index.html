@@ -35,15 +35,18 @@
         .play-triangle { width: 0; height: 0; border-top: 25px solid transparent; border-bottom: 25px solid transparent; border-left: 40px solid white; margin-left: 15px; }
 
         /* ---------- POKEDEX BUTTON ---------- */
-        #pokedex-trigger { position: fixed; top: calc(env(safe-area-inset-top, 20px) + 5px); right: 15px; width: 50px; height: 50px; background: white; border: 4px solid #333; border-radius: 50%; z-index: 100; cursor: pointer; overflow: hidden; transition: transform .15s; }
-        #pokedex-trigger:active { transform: scale(0.88); }
-        #pokedex-trigger::before { content: ''; width: 100%; height: 6px; background: #333; position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1; }
-        #pokedex-trigger::after { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 4px solid #333; }
-        #poke-btn-white { width: 14px; height: 14px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
+        #top-bar { flex-shrink: 0; width: 100%; max-width: 500px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 0 4px 6px; }
+        .bar-btn { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 4px solid #333; cursor: pointer; transition: transform .12s; flex-shrink: 0; }
+        .bar-btn:active { transform: scale(.88); }
+        #stats-trigger { background: linear-gradient(#fff, #dfe6ee); display: flex; align-items: center; justify-content: center; }
+        #pokedex-trigger { background: white; overflow: hidden; }
+        #pokedex-trigger::before { content: ''; width: 100%; height: 5px; background: #333; position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1; }
+        #pokedex-trigger::after { content: ''; width: 100%; height: 50%; background: #ff0000; position: absolute; top: 0; border-bottom: 3px solid #333; }
+        #poke-btn-white { width: 12px; height: 12px; background: white; border: 3px solid #333; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
 
         /* ---------- CARD ---------- */
-        #game-view { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: env(safe-area-inset-top, 20px) 10px env(safe-area-inset-bottom, 10px); box-sizing: border-box; }
-        #pokemon-card { width: 98vw; height: 92vh; max-width: 500px; border: 10px solid transparent; border-radius: 35px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box;
+        #game-view { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: calc(env(safe-area-inset-top, 20px) + 4px) 10px env(safe-area-inset-bottom, 10px); box-sizing: border-box; }
+        #pokemon-card { width: 100%; flex: 1; min-height: 0; max-width: 500px; border: 10px solid transparent; border-radius: 35px; padding: 12px; display: flex; flex-direction: column; position: relative; box-sizing: border-box;
             background: linear-gradient(175deg, #fffef6, #fdf6dc) padding-box,
                         linear-gradient(140deg, var(--type-c1), var(--card-gold) 30%, var(--type-c2) 65%, var(--card-gold) 100%) border-box;
             box-shadow: 0 12px 40px rgba(0,0,0,.55), inset 0 0 18px rgba(255, 215, 0, .25); }
@@ -84,6 +87,21 @@
         .wrong { background: linear-gradient(#ff6a55, #d63a24) !important; color: white !important; border-color: #8b1a0a !important; pointer-events: none; box-shadow: none !important; text-decoration: line-through; }
 
         /* ---------- POKEDEX ---------- */
+        #stats-view { position: fixed; inset: 0; padding: calc(env(safe-area-inset-top, 15px) + 5px) 20px calc(env(safe-area-inset-bottom, 10px) + 10px); background: linear-gradient(180deg, #3d7dca, #16345f); z-index: 9500; display: none; flex-direction: column; color: white; }
+        #stats-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px 0; align-content: start; }
+        .stat-card { background: rgba(255,255,255,.13); border: 2px solid rgba(255,255,255,.25); border-radius: 16px; padding: 14px 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+        .stat-emoji { font-size: 30px; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+        .stat-num { font-family: var(--game-font); font-size: 24px; color: var(--poke-yellow); text-shadow: 1px 2px 0 rgba(0,0,0,.35); padding-top: 4px; }
+        .stat-label { font-size: 11px; font-weight: 800; opacity: .88; font-family: var(--body-font); }
+        #detail-modal { position: fixed; inset: 0; z-index: 9600; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.7); }
+        .detail-card { background: linear-gradient(175deg, #fffef6, #fdf6dc); color: #333; border-radius: 24px; border: 6px solid var(--card-gold); max-width: 300px; width: 82%; padding: 18px 16px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,.5); position: relative; }
+        .detail-card img { width: 78%; max-height: 34vh; object-fit: contain; filter: drop-shadow(0 6px 8px rgba(0,0,0,.3)); }
+        #detail-x { position: absolute; top: 8px; right: 14px; font-size: 26px; cursor: pointer; color: #666; line-height: 1; }
+        #detail-name { font-family: var(--game-font); font-size: 22px; margin-top: 6px; }
+        #detail-type { display: inline-block; margin-top: 8px; padding: 5px 16px 2px; border-radius: 12px; color: #fff; font-family: var(--game-font); font-size: 13px; letter-spacing: 1px; }
+        #m-toast { position: fixed; top: 16%; left: 50%; transform: translateX(-50%) scale(0); z-index: 9650; background: linear-gradient(#333, #111); color: var(--poke-yellow); font-family: var(--game-font); font-size: 20px; padding: 12px 24px 8px; border-radius: 18px; border: 3px solid #fff; box-shadow: 0 8px 20px rgba(0,0,0,.4); pointer-events: none; white-space: nowrap; }
+        #m-toast.show { animation: mToastPop 1.5s ease forwards; }
+        @keyframes mToastPop { 0% { transform: translateX(-50%) scale(0); } 12% { transform: translateX(-50%) scale(1.08); } 20%, 80% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(0); opacity: 0; } }
         #pokedex-view { position: fixed; inset: 0; padding-top: env(safe-area-inset-top, 20px); background: var(--pokedex-red); z-index: 9500; display: none; flex-direction: column; padding-left: 20px; padding-right: 20px; color: white; box-sizing: border-box; }
         #pokedex-list { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 10px; padding: 20px 0; }
         .dex-entry { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 5px; text-align: center; }
@@ -151,8 +169,20 @@
     </div>
 </div>
 
-<div id="pokedex-trigger" onclick="openDex()"><div id="poke-btn-white"></div></div>
 
+<div id="m-toast"></div>
+<div id="stats-view">
+    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;"><h2 style="margin:0; font-family: var(--game-font);">TRAINER STATS</h2><div onclick="closeStats()" style="font-size:30px; cursor:pointer; line-height:1;">✕</div></div>
+    <div id="stats-grid"></div>
+</div>
+<div id="detail-modal" onclick="closeDetail()">
+    <div class="detail-card" onclick="event.stopPropagation()">
+        <div id="detail-x" onclick="closeDetail()">✕</div>
+        <img id="detail-img" alt="">
+        <div id="detail-name"></div>
+        <div id="detail-type"></div>
+    </div>
+</div>
 <div id="pokedex-view">
     <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid white; padding-bottom: 10px;"><h2 id="dex-title" style="margin:0; font-family: var(--game-font);">POKEDEX</h2><div onclick="closeDex()" style="font-size:30px; cursor:pointer">X</div></div>
     <div id="pokedex-list"></div>
@@ -204,6 +234,10 @@
 <div id="flash"></div>
 
 <div id="game-view">
+    <div id="top-bar">
+        <div id="stats-trigger" class="bar-btn" onclick="openStats()"><svg width="21" height="21" viewBox="0 0 24 24"><rect x="3" y="12" width="5" height="9" rx="1.5" fill="#3d7dca"/><rect x="9.5" y="6" width="5" height="15" rx="1.5" fill="#ffcb05" stroke="#b8860b" stroke-width="1"/><rect x="16" y="9" width="5" height="12" rx="1.5" fill="#dc0a2d"/></svg></div>
+        <div id="pokedex-trigger" class="bar-btn" onclick="openDex()"><div id="poke-btn-white"></div></div>
+    </div>
     <div id="pokemon-card">
         <div class="header">
             <div class="name-cluster"><div id="energy-orb"></div><div id="poke-name-badge">NAME</div><div id="rebirth-stars"></div></div>
@@ -287,7 +321,9 @@
         { id:'latios', t:'dragon', p:[{n:'Latios',i:381}], mega:{n:'Mega Latios', i:10063} },
         { id:'lopun', t:'normal', p:[{n:'Buneary',i:427},{n:'Lopunny',i:428}], mega:{n:'Mega Lopunny', i:10088} },
         { id:'audin', t:'fairy', p:[{n:'Audino',i:531}], mega:{n:'Mega Audino', i:10069} },
-        { id:'dian', t:'fairy', p:[{n:'Diancie',i:719}], mega:{n:'Mega Diancie', i:10075} }
+        { id:'dian', t:'fairy', p:[{n:'Diancie',i:719}], mega:{n:'Mega Diancie', i:10075} },
+        { id:'gyar', t:'water', p:[{n:'Magikarp',i:129},{n:'Gyarados',i:130}], mega:{n:'Mega Gyarados', i:10041} },
+        { id:'pidg', t:'normal', p:[{n:'Pidgey',i:16},{n:'Pidgeotto',i:17},{n:'Pidgeot',i:18}], mega:{n:'Mega Pidgeot', i:10073} }
     ];
 
     /* ================= WORD CURRICULUM =================
@@ -396,6 +432,20 @@
     const synth = window.speechSynthesis, audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let family, stageIdx = 0, hp = 100, currentSet, matchesThisRound = 0, isGameOver = false, usedRoots = [], currentMega;
     let unlocked = JSON.parse(localStorage.getItem('pm_unlocked_v16')) || [];
+    let mStats = Object.assign({ c: 0, w: 0, bs: 0, e: 0, m: 0, wk: '', wa: 0, wc: 0 }, JSON.parse(localStorage.getItem('pm_stats_v1')) || {});
+    let wordStreak = 0;
+    function mWeekKey() { const d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return d.toDateString(); }
+    function recordWord(ok) {
+        if (mStats.wk !== mWeekKey()) { mStats.wk = mWeekKey(); mStats.wa = 0; mStats.wc = 0; }
+        mStats.wa++;
+        if (ok) { mStats.c++; mStats.wc++; wordStreak++; mStats.bs = Math.max(mStats.bs, wordStreak); }
+        else { mStats.w++; wordStreak = 0; }
+        localStorage.setItem('pm_stats_v1', JSON.stringify(mStats));
+    }
+    function saveMStats() { localStorage.setItem('pm_stats_v1', JSON.stringify(mStats)); }
+    function showMToast(txt) { const t = document.getElementById('m-toast'); t.innerText = txt; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); }
+    const monIndex = [];
+    megaLibrary.forEach(f => { const pks = [...f.p, ...(f.megas || [f.mega])]; pks.forEach(pk => monIndex.push({ id: pk.i, name: pk.n, type: f.t })); });
     let rebirthLevel = parseInt(localStorage.getItem('pm_rebirth') || '0', 10); // 0,1,2
     let isUltimate = localStorage.getItem('pm_ultimate') === '1';
     const allIds = (() => { const s = new Set(); megaLibrary.forEach(f => { f.p.forEach(p => s.add(p.i)); (f.megas || [f.mega]).forEach(m => s.add(m.i)); }); return [...s]; })();
@@ -467,15 +517,27 @@
         return new Promise(res => {
             if (!synth) return res();
             try {
-                synth.cancel();
-                const u = new SpeechSynthesisUtterance(txt.toLowerCase().replace(/-/g, ' '));
                 if (!ukVoice || synth.getVoices().indexOf(ukVoice) === -1) pickVoice(); // iOS: voices arrive late
-                if (ukVoice) u.voice = ukVoice;
-                u.lang = ukVoice ? ukVoice.lang : 'en-GB'; u.rate = 0.98; u.pitch = 1.05;
+                synth.cancel();
+                const clean = txt.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+                // speak sentence by sentence: the queue gap adds a natural pause even on basic voices
+                const parts = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+                const compact = ukVoice && /compact/i.test(ukVoice.voiceURI || '');
                 let done = false; const fin = () => { if (!done) { done = true; res(); } };
-                u.onend = fin; u.onerror = fin;
-                synth.speak(u);
-                setTimeout(fin, Math.max(2000, txt.length * 120)); // fallback only; scales with length
+                let queued = 0;
+                parts.forEach(p => {
+                    const s = p.trim(); if (!s) return;
+                    const u = new SpeechSynthesisUtterance(s.charAt(0) + s.slice(1).toLowerCase());
+                    if (ukVoice) u.voice = ukVoice;
+                    u.lang = ukVoice ? ukVoice.lang : 'en-GB';
+                    u.rate = compact ? 0.9 : 0.98; u.pitch = 1.05; // basic voices rush - slow them a touch
+                    u.onend = () => { if (--queued <= 0) fin(); };
+                    u.onerror = () => { if (--queued <= 0) fin(); };
+                    queued++;
+                    synth.speak(u);
+                });
+                if (!queued) return fin();
+                setTimeout(fin, Math.max(2500, clean.length * 130)); // safety fallback
             } catch (e) { res(); }
         });
     }
@@ -600,6 +662,7 @@
         if (el.classList.contains('matched') || el.classList.contains('wrong')) return;
         const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
         if (isCorrect) {
+            recordWord(true);
             const dot = document.getElementById(`dot-${matchesThisRound}`);
             dot.classList.add('active');
             el.innerText = word.toUpperCase(); el.classList.add('matched');
@@ -611,6 +674,7 @@
                 speak((Math.random() < 0.5 ? pick(MPHRASES.praise) + ' ' : '') + word).then(() => setTimeout(runEvolution, 400));
             } else speak((Math.random() < 0.4 ? pick(MPHRASES.praise) + ' ' : '') + word);
         } else {
+            recordWord(false);
             el.innerText = word.toUpperCase(); el.classList.add('wrong');
             hp -= 33.4; playSfx('miss'); flashScreen('red');
             const card = document.getElementById('pokemon-card');
@@ -634,6 +698,7 @@
         const scene = document.getElementById('evo-scene'), evoImg = document.getElementById('evo-poke-img');
         const oldN = (stageIdx < family.p.length) ? family.p[stageIdx].n : currentMega.n;
         hp = 100; // heal on evolution
+        mStats.e++; saveMStats();
         evoActive = true;
         if (stageIdx >= family.p.length - 1) {
             const nextN = currentMega.n; evoImg.src = document.getElementById('poke-img').src;
@@ -649,6 +714,7 @@
                 const row = document.getElementById('parade-row'); row.innerHTML = "";
                 family.p.forEach(px => { row.innerHTML += `<img style="width:40px" src="${SPRITE(px.i)}">`; });
                 row.querySelectorAll('img').forEach(safeImg);
+                mStats.m++; saveMStats();
                 document.getElementById('finale-overlay').style.display = 'flex';
                 speak(pick(MPHRASES.mega));
                 if (dexIsComplete() && !(rebirthLevel >= 2 && isUltimate)) setTimeout(onDexComplete, 2600); // re-offer if they said "Not yet" earlier
@@ -677,11 +743,38 @@
         });
         list.innerHTML = htmlStr; // single parse - images load once
         list.querySelectorAll('img').forEach((img, idx) => { safeImg(img, SPRITE(ids[idx])); img.src = SPRITE_SM(ids[idx]); });
+        list.querySelectorAll('.dex-entry').forEach((el, idx) => { el.onclick = () => dexEntryTap(monIndex[idx]); });
         const rank = isUltimate ? ' 👑' : (rebirthLevel > 0 ? ' ' + '★'.repeat(rebirthLevel) : '');
         document.getElementById('dex-title').innerText = `FOUND: ${count}/${total}${rank}`;
         document.getElementById('pokedex-view').style.display = 'flex';
     }
     function closeDex() { document.getElementById('pokedex-view').style.display = 'none'; }
+    function openStats() {
+        if (mStats.wk !== mWeekKey()) { mStats.wk = mWeekKey(); mStats.wa = 0; mStats.wc = 0; }
+        const acc = (mStats.c + mStats.w) ? Math.round(mStats.c / (mStats.c + mStats.w) * 100) : 0;
+        const cards = [
+            ['🏆', isUltimate ? '👑' : rebirthLevel + 1, 'Rebirth Level'], ['📗', unlocked.length + '/' + allIds.length, 'Pokémon Found'],
+            ['🔠', mStats.c, 'Real Words Found'], ['🔥', mStats.bs, 'Best Word Streak'],
+            ['🧬', mStats.e, 'Evolutions'], ['🏅', mStats.m, 'Mega Masters'],
+            ['📈', acc + '%', 'Accuracy'], ['📅', mStats.wc + '/' + mStats.wa, 'Words This Week']
+        ];
+        document.getElementById('stats-grid').innerHTML = cards.map(([e, n, l]) =>
+            `<div class="stat-card"><div class="stat-emoji">${e}</div><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('');
+        document.getElementById('stats-view').style.display = 'flex';
+    }
+    function closeStats() { document.getElementById('stats-view').style.display = 'none'; }
+    function dexEntryTap(mon) {
+        if (!unlocked.includes(mon.id)) { showMToast('Not found yet!'); return; }
+        const th = typeThemes[mon.type] || typeThemes.normal;
+        const img = document.getElementById('detail-img');
+        safeImg(img, SPRITE_SM(mon.id)); img.src = SPRITE(mon.id);
+        document.getElementById('detail-name').innerText = mon.name;
+        const t = document.getElementById('detail-type');
+        t.innerText = mon.type.toUpperCase(); t.style.background = th.c2;
+        document.querySelector('.detail-card').style.borderColor = th.c2;
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+    function closeDetail() { document.getElementById('detail-modal').style.display = 'none'; }
     function askReset() {
         document.getElementById('confirm-msg').innerText = `All ${unlocked.length} of your Pokémon will be released and you'll go back to Level 1 with a brand new Pokédex!`;
         document.getElementById('confirm-modal').style.display = 'flex';
@@ -740,7 +833,7 @@
         currentMega = family.megas ? family.megas[Math.floor(Math.random() * family.megas.length)] : family.mega;
         initStage();
     }
-    const GAME_VERSION = 18; // bump on each release
+    const GAME_VERSION = 19; // bump on each release
     document.getElementById('ver').innerText = 'v' + GAME_VERSION;
     function setAppH() { document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px'); }
     window.addEventListener('resize', setAppH);

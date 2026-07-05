@@ -6,7 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
-    <title>PokeMorph v18</title>
+    <title>PokéMorph</title>
+    <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="apple-mobile-web-app-title" content="PokéMorph">
+    <meta name="theme-color" content="#3d7dca">
     <style>
         :root {
             --card-gold: #ffd700; --hp-green: #4caf50; --hp-yellow: #ffcc00; --hp-red: #ff4422;
@@ -15,7 +19,10 @@
             --body-font: 'Baloo 2', 'Arial Rounded MT Bold', sans-serif;
             --type-c1: #ff7043; --type-c2: #c62828;
         }
-        html, body { position: fixed; overflow: hidden; width: 100%; height: 100%; margin: 0; padding: 0; box-sizing: border-box; touch-action: none; background: #000; display: flex; justify-content: center; align-items: center; font-family: var(--body-font); -webkit-user-select: none; user-select: none; }
+        html { position: fixed; overflow: hidden; width: 100%; height: 100%; height: -webkit-fill-available; margin: 0; padding: 0; background: #3d7dca; }
+        body { position: fixed; overflow: hidden; width: 100%; margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; background: #000; display: flex; justify-content: center; align-items: center; font-family: var(--body-font); -webkit-user-select: none; user-select: none;
+               height: 100%; height: -webkit-fill-available; height: 100dvh; height: var(--app-h, 100dvh); }
+        * { touch-action: manipulation; }
 
         /* ---------- START SCREEN ---------- */
         #start-gate { position: fixed; inset: 0; background: #3d7dca; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
@@ -137,8 +144,9 @@
     <div class="float-ball" style="top:12%; left:10%;"></div>
     <div class="float-ball" style="top:70%; left:80%; animation-delay:-2s;"></div>
     <div class="float-ball" style="top:78%; left:14%; animation-delay:-4s; width:34px; height:34px;"></div>
+    <div id="ver" style="position:absolute; bottom: calc(env(safe-area-inset-bottom, 8px) + 8px); right: 14px; z-index: 6; font-weight: 800; font-size: 12px; color: rgba(255,255,255,.65); font-family: var(--body-font);"></div>
     <div class="logo-container">
-        <h1 class="logo-text">PokeMorph</h1>
+        <h1 class="logo-text">PokéMorph</h1>
         <div class="play-icon-btn" onclick="startGame()"><div class="play-triangle"></div></div>
     </div>
 </div>
@@ -410,15 +418,50 @@
 
     /* ================= VOICE (natural British) ================= */
     let ukVoice = null;
+    function scoreVoice(v) {
+        if (!v.lang || !/^en/i.test(v.lang)) return -1;
+        let s = 0; const n = v.name || '', uri = v.voiceURI || '';
+        if (/en[-_]GB/i.test(v.lang)) s += 40;
+        else if (/en[-_](IE|AU|NZ|ZA)/i.test(v.lang)) s += 18;
+        else s += 6;
+        if (/natural/i.test(n)) s += 30;
+        if (/enhanced|premium/i.test(n + uri)) s += 22;
+        if (/compact/i.test(uri)) s -= 8;
+        if (/sonia|libby|maisie|hollie|olivia|kate|serena|stephanie|martha|susan|hazel|karen|moira|tessa|samantha|nicky|allison|ava|zoe|shelley|joelle|google uk english female|\bfemale\b/i.test(n)) s += 25;
+        if (/\bmale\b|daniel|arthur|ryan|thomas|oliver|george|aaron|fred|gordon|rishi|lee\b/i.test(n)) s -= 20;
+        if (v.localService === false) s += 4;
+        return s;
+    }
     function pickVoice() {
         const vs = synth.getVoices(); if (!vs.length) return;
-        const prefs = [/Sonia.*Natural/i, /Libby.*Natural/i, /Maisie.*Natural/i, /Ryan.*Natural/i, /Thomas.*Natural/i,
-                       /Google UK English Female/i, /Google UK English Male/i,
-                       /Sonia/i, /Libby/i, /Serena/i, /Kate/i, /Stephanie/i, /Daniel/i, /Martha/i, /Arthur/i];
-        for (const p of prefs) { const v = vs.find(v => p.test(v.name) && v.lang.startsWith('en')); if (v) { ukVoice = v; return; } }
-        ukVoice = vs.find(v => v.lang === 'en-GB') || vs.find(v => v.lang.startsWith('en')) || null;
+        const ranked = vs.map(v => [scoreVoice(v), v]).filter(([s]) => s >= 0).sort((a, b) => b[0] - a[0]);
+        ukVoice = ranked.length ? ranked[0][1] : null;
     }
     if (synth) { synth.onvoiceschanged = pickVoice; pickVoice(); }
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const MPHRASES = {
+        praise: ["Brilliant!", "Well done!", "Spot on!", "Super!", "Great work!", "Fantastic!", "Nice one!"],
+        find: [
+            (n, c) => `Find the ${n} real words made from: ${c}`,
+            (n, c) => `Can you spot the ${n} real ${c} words?`,
+            (n, c) => `Hunt down the ${n} real words built from ${c}!`
+        ],
+        findOne: [
+            c => `Find the one real word made from: ${c}`,
+            c => `Only one real ${c} word is hiding. Find it!`,
+            c => `Just one real ${c} word here. Can you find it?`
+        ],
+        notWord: [
+            w => `${w}? That's not a real word!`,
+            w => `Oops! ${w} isn't a real word!`,
+            w => `${w}? No such word!`,
+            w => `Hmm, ${w} is a made-up word!`
+        ],
+        evolving: [o => `${o} is evolving!`, o => `Look! ${o} is starting to evolve!`, o => `Whoa! ${o} is evolving!`],
+        evolved: [(o, n) => `${o} evolved into ${n}!`, (o, n) => `Amazing! ${o} became ${n}!`, (o, n) => `Incredible! ${o} evolved into ${n}!`],
+        mega: ["Incredible! You are a Mega Master!", "Wow! A true Mega Master!", "Amazing work, Mega Master!"],
+        ko: ["Oh no! Don't give up! Let's try again!", "Never mind! You'll get it next time!", "Good try! Have another go!"]
+    };
 
     function speak(txt) {
         return new Promise(res => {
@@ -426,8 +469,9 @@
             try {
                 synth.cancel();
                 const u = new SpeechSynthesisUtterance(txt.toLowerCase().replace(/-/g, ' '));
+                if (!ukVoice || synth.getVoices().indexOf(ukVoice) === -1) pickVoice(); // iOS: voices arrive late
                 if (ukVoice) u.voice = ukVoice;
-                u.lang = 'en-GB'; u.rate = 0.95; u.pitch = 1.05;
+                u.lang = ukVoice ? ukVoice.lang : 'en-GB'; u.rate = 0.98; u.pitch = 1.05;
                 let done = false; const fin = () => { if (!done) { done = true; res(); } };
                 u.onend = fin; u.onerror = fin;
                 synth.speak(u);
@@ -549,7 +593,7 @@
             const d = document.createElement('div'); d.className = 'target'; d.innerText = o.text;
             d.onclick = () => handleTap(d, o.ok, o.word); grid.appendChild(d);
         });
-        await speak(needed === 1 ? `Find the one real word made from: ${currentSet.core}` : `Find the ${needed} real words made from: ${currentSet.core}`);
+        await speak(needed === 1 ? pick(MPHRASES.findOne)(currentSet.core) : pick(MPHRASES.find)(needed, currentSet.core));
     }
 
     function handleTap(el, isCorrect, word) {
@@ -564,8 +608,8 @@
             if (matchesThisRound === matchesNeeded()) {
                 const pk = (stageIdx < family.p.length) ? family.p[stageIdx] : currentMega;
                 unlockPk(pk.i);
-                speak(word).then(() => setTimeout(runEvolution, 400));
-            } else speak(word);
+                speak((Math.random() < 0.5 ? pick(MPHRASES.praise) + ' ' : '') + word).then(() => setTimeout(runEvolution, 400));
+            } else speak((Math.random() < 0.4 ? pick(MPHRASES.praise) + ' ' : '') + word);
         } else {
             el.innerText = word.toUpperCase(); el.classList.add('wrong');
             hp -= 33.4; playSfx('miss'); flashScreen('red');
@@ -578,10 +622,10 @@
                 document.getElementById('defeat-img').src = document.getElementById('poke-img').src;
                 setTimeout(() => {
                     document.getElementById('defeat-overlay').style.display = 'flex';
-                    speak("Oh no! Don't give up! Let's try again!");
+                    speak(pick(MPHRASES.ko));
                 }, 500);
             } else {
-                speak(`${word}? That's not a real word!`);
+                speak(pick(MPHRASES.notWord)(word.toLowerCase()));
             }
         }
     }
@@ -594,10 +638,10 @@
         if (stageIdx >= family.p.length - 1) {
             const nextN = currentMega.n; evoImg.src = document.getElementById('poke-img').src;
             document.getElementById('evo-text').innerText = oldN.toUpperCase() + "..."; scene.classList.add('active'); playSfx('evo_build');
-            await speak(`${oldN} is evolving!`);
+            await speak(pick(MPHRASES.evolving)(oldN));
             flashScreen('white'); playSfx('evo_flash');
             evoImg.src = SPRITE(currentMega.i);
-            document.getElementById('evo-text').innerText = nextN.toUpperCase() + "!"; await speak(`${oldN} evolved into ${nextN}!`);
+            document.getElementById('evo-text').innerText = nextN.toUpperCase() + "!"; await speak(pick(MPHRASES.evolved)(oldN, nextN));
             setTimeout(() => {
                 scene.classList.remove('active'); evoActive = false; isGameOver = true; playSfx('fanfare');
                 unlockPk(currentMega.i);
@@ -606,17 +650,17 @@
                 family.p.forEach(px => { row.innerHTML += `<img style="width:40px" src="${SPRITE(px.i)}">`; });
                 row.querySelectorAll('img').forEach(safeImg);
                 document.getElementById('finale-overlay').style.display = 'flex';
-                speak("Incredible! You are a Mega Master!");
+                speak(pick(MPHRASES.mega));
                 if (dexIsComplete() && !(rebirthLevel >= 2 && isUltimate)) setTimeout(onDexComplete, 2600); // re-offer if they said "Not yet" earlier
             }, 1000); return;
         }
         stageIdx++; const nextN = family.p[stageIdx].n;
         evoImg.src = SPRITE(family.p[stageIdx - 1].i);
         document.getElementById('evo-text').innerText = oldN.toUpperCase() + "..."; scene.classList.add('active'); playSfx('evo_build');
-        await speak(`${oldN} is evolving!`);
+        await speak(pick(MPHRASES.evolving)(oldN));
         flashScreen('white'); playSfx('evo_flash');
         evoImg.src = SPRITE(family.p[stageIdx].i);
-        document.getElementById('evo-text').innerText = nextN.toUpperCase() + "!"; await speak(`${oldN} evolved into ${nextN}!`);
+        document.getElementById('evo-text').innerText = nextN.toUpperCase() + "!"; await speak(pick(MPHRASES.evolved)(oldN, nextN));
         setTimeout(() => { scene.classList.remove('active'); evoActive = false; initStage(); }, 1000);
     }
 
@@ -696,6 +740,14 @@
         currentMega = family.megas ? family.megas[Math.floor(Math.random() * family.megas.length)] : family.mega;
         initStage();
     }
+    const GAME_VERSION = 18; // bump on each release
+    document.getElementById('ver').innerText = 'v' + GAME_VERSION;
+    function setAppH() { document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px'); }
+    window.addEventListener('resize', setAppH);
+    window.addEventListener('orientationchange', () => setTimeout(setAppH, 150));
+    setAppH();
+    document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {})); }
     animateFX();
 </script>
 </body>
